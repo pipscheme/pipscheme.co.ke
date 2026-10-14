@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PIPSCHEME - Login</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>body{background:#070707;color:#fff;font-family:Arial;display:flex;justify-content:center;align-items:center;min-height:100vh} .box{background:#111;border:1px solid #222;padding:40px;border-radius:20px;width:90%;max-width:400px} input{width:100%;padding:15px;margin:10px 0;background:#1a1a1a;border:1px solid #333;border-radius:10px;color:#fff} button{width:100%;padding:15px;border:none;border-radius:50px;font-weight:800;margin-top:10px;cursor:pointer} .red{background:#ff1a1a;color:#fff} .white{background:#fff;color:#000} h1{color:#ff1a1a;text-align:center;margin-bottom:20px}</style>
+</head><body>
+<div class="box">
+<h1>PIPSCHEME</h1>
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<button class="red" onclick="signup()">CREATE ACCOUNT</button>
+<button class="white" onclick="login()">LOGIN</button>
+<p id="msg" style="text-align:center;margin-top:15px;color:#888"></p>
+</div>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",
+  authDomain: "pipscheme.firebaseapp.com",
+  projectId: "pipscheme",
+  storageBucket: "pipscheme.firebasestorage.app",
+  messagingSenderId: "555422651951",
+  appId: "1:555422651951:web:db2d906848bee12d4958da"
+};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(); const db=firebase.firestore();
+async function signup(){
+ const e=document.getElementById('email').value,p=document.getElementById('password').value;
+ try{
+  const res=await auth.createUserWithEmailAndPassword(e,p);
+  await db.collection('users').doc(res.user.uid).set({email:e,balance:0,totalDeposits:0,createdAt:new Date(),role:'trader'});
+  msg.innerText="Account created! Redirecting..."; setTimeout(()=>location.href='trading.html',1000);
+ }catch(err){msg.innerText=err.message}
+}
+async function login(){
+ const e=document.getElementById('email').value,p=document.getElementById('password').value;
+ try{
+  await auth.signInWithEmailAndPassword(e,p);
+  location.href='trading.html';
+ }catch(err){msg.innerText=err.message}
+}
+</script></body></html>
