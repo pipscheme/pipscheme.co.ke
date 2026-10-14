@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIPSCHEME.CO.KE - Trade 24/7 | Red & White</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#080808;color:#fff;font-family:Inter,Arial;overflow-x:hidden}
+nav{position:fixed;top:0;width:100%;background:rgba(0,0,0,0.9);backdrop-filter:blur(20px);padding:15px 5%;display:flex;justify-content:space-between;align-items:center;z-index:100;border-bottom:1px solid #222}
+.logo{font-size:28px;font-weight:900;color:#ff1a1a;letter-spacing:2px}
+.logo span{color:#fff}
+.btn{padding:12px 28px;border-radius:50px;font-weight:800;border:none;cursor:pointer;transition:.3s}
+.btn-red{background:#ff1a1a;color:#fff}
+.btn-white{background:#fff;color:#000}
+.btn:hover{transform:scale(1.05)}
+.hero{min-height:100vh;display:flex;align-items:center;padding:100px 5% 50px;background:radial-gradient(circle at 20% 50%,rgba(255,26,26,0.15),transparent 50%)}
+.hero-text{flex:1}
+.hero-text h1{font-size:58px;line-height:0.9;font-weight:900}
+.hero-text h1 span{color:#ff1a1a}
+.hero-text p{color:#888;margin:20px 0;font-size:18px;max-width:500px}
+.hero-img{flex:1;position:relative}
+.hero-img img{width:100%;border-radius:20px;box-shadow:0 0 100px rgba(255,26,26,0.3);animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+.ticker{background:#ff1a1a;padding:10px 0;white-space:nowrap;overflow:hidden}
+.ticker span{display:inline-block;animation:scroll 30s linear infinite;padding-right:50px;font-weight:800}
+@keyframes scroll{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;padding:50px 5%}
+.card{background:#111;border:1px solid #222;padding:25px;border-radius:20px}
+.card h3{color:#ff1a1a}
+.price{font-size:24px;font-weight:800;margin:10px 0}
+.up{color:#00ff88}.down{color:#ff4444}
+.section{padding:60px 5%;text-align:center}
+</style>
+</head>
+<body>
+<nav>
+<div class="logo">PIP<span>SCHEME</span>.CO.KE</div>
+<div><button class="btn btn-white" onclick="location.href='auth.html'">LOGIN</button> <button class="btn btn-red" onclick="location.href='auth.html'">CREATE ACCOUNT</button></div>
+</nav>
+
+<div class="ticker"><span>EUR/USD 1.0876 +0.32% • GBP/USD 1.2645 -0.11% • USD/JPY 149.32 +0.15% • BTC/USD 67,432 +2.1% • GOLD 2,345 +0.8% • NAS100 18,234 +1.2% • S&P500 5,234 +0.5% • 24/7 TRADING LIVE • MIN DEPOSIT 650 KSH • INSTANT M-PESA DEPOSIT • </span></div>
+
+<div class="hero">
+<div class="hero-text">
+<h1>TRADE <span>24/7</span><br>WITH <span>POWER</span></h1>
+<p>Flashy red & white trading terminal. Forex, Stocks, Crypto, Indices. Instant deposit via M-Pesa. Minimum 650 KSH. Funds secured in your PIPSCHEME wallet.</p>
+<div style="margin-top:30px"><button class="btn btn-red" onclick="location.href='auth.html'" style="padding:18px 45px;font-size:18px">START TRADING NOW →</button></div>
+<p style="margin-top:15px;color:#555;font-size:13px">🔒 Military-grade database • Anti-DDoS • Encrypted • CMA Compliant</p>
+</div>
+<div class="hero-img">
+<img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800" alt="Trader">
+<div style="position:absolute;bottom:-20px;left:-20px;background:#ff1a1a;padding:15px 25px;border-radius:15px;font-weight:900">LIVE: $1.2M+ TRADING VOL</div>
+</div>
+</div>
+
+<div class="grid" id="marketGrid"></div>
+
+<div class="section" style="background:#0f0f0f">
+<h2 style="font-size:36px;font-weight:900">WHY <span style="color:#ff1a1a">PIPSCHEME</span></h2>
+<div class="grid" style="margin-top:30px">
+<div class="card"><h3>⚡ Instant M-Pesa</h3><p style="color:#666;margin-top:10px">Deposit 650 KSH minimum, in your wallet in 10 seconds. Withdraw 24/7.</p></div>
+<div class="card"><h3>🛡️ Secure Database</h3><p style="color:#666;margin-top:10px">Firebase encrypted, rules, 2FA, rate-limit, anti-SQL, anti-XSS protected.</p></div>
+<div class="card"><h3>📈 100+ Assets</h3><p style="color:#666;margin-top:10px">Forex, Stocks (AAPL, TSLA), Crypto, Gold, Indices live rates.</p></div>
+</div>
+</div>
+
+<script>
+// Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",
+  authDomain: "pipscheme.firebaseapp.com",
+  projectId: "pipscheme",
+  storageBucket: "pipscheme.firebasestorage.app",
+  messagingSenderId: "555422651951",
+  appId: "1:555422651951:web:db2d906848bee12d4958da"
+};
+firebase.initializeApp(firebaseConfig);
+
+// Live Prices Simulation + Real API
+const markets = [
+ {s:"EUR/USD",p:1.0876,c:"+0.32%"},{s:"GBP/USD",p:1.2645,c:"-0.11%"},{s:"USD/JPY",p:149.32,c:"+0.15%"},{s:"BTC/USD",p:67432,c:"+2.1%"},{s:"AAPL",p:182.34,c:"+1.2%"},{s:"TSLA",p:245.12,c:"-0.8%"},{s:"GOLD",p:2345,c:"+0.8%"},{s:"S&P500",p:5234,c:"+0.5%"}
+];
+const grid=document.getElementById('marketGrid');
+function render(){
+ grid.innerHTML="";
+ markets.forEach(m=>{
+  const isUp=m.c.includes('+');
+  grid.innerHTML+=<div class="card"><h3>${m.s}</h3><div class="price">${m.p.toLocaleString()}</div><div class="${isUp?'up':'down'}">${m.c} LIVE</div><button class="btn btn-red" style="margin-top:10px;width:100%" onclick="location.href='auth.html'">TRADE NOW</button></div>;
+ });
+}
+render();
+setInterval(()=>{markets.forEach(m=>m.p+= (Math.random()-0.5)*0.5);render()},3000);
+</script>
+</body>
+</html>
