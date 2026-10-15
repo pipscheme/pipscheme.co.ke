@@ -3,141 +3,114 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIPSCHEME PRO</title>
+<title>PIPSCHEME PRO - Live Trading</title>
+<script src="https://s3.tradingview.com/tv.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial}
 body{
-  background: radial-gradient(ellipse at top left, #1a0a00 0%, #000000 40%, #0a001a 100%);
+  background: radial-gradient(ellipse at top left, #1a0a00 0%, #000000 45%, #0a001a 100%);
   min-height:100vh;color:#fff;overflow-x:hidden;position:relative
 }
-/* ANIMATED GLOW BACKGROUND */
 body::before{
   content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;
-  background: radial-gradient(circle at 20% 30%, rgba(255,69,0,0.15) 0%, transparent 50%),
-              radial-gradient(circle at 80% 70%, rgba(138,43,226,0.15) 0%, transparent 50%),
-              radial-gradient(circle at 50% 50%, rgba(255,0,80,0.08) 0%, transparent 60%);
+  background: radial-gradient(circle at 20% 30%, rgba(255,69,0,0.18) 0%, transparent 50%),
+              radial-gradient(circle at 80% 70%, rgba(138,43,226,0.18) 0%, transparent 50%);
   animation: moveGlow 15s ease-in-out infinite;z-index:-1
 }
 @keyframes moveGlow{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-30px)}}
-
 .top{
-  backdrop-filter:blur(20px);background:rgba(20,20,20,0.7);border-bottom:1px solid rgba(255,80,0,0.3);
-  display:flex;justify-content:space-between;align-items:center;padding:14px 16px;position:sticky;top:0;z-index:10
+  backdrop-filter:blur(20px);background:rgba(20,20,20,0.75);border-bottom:1px solid rgba(255,80,0,0.35);
+  display:flex;justify-content:space-between;align-items:center;padding:12px 14px;position:sticky;top:0;z-index:20
 }
-.logo{font-weight:900;letter-spacing:2px;color:#ff4500}
+.logo{font-weight:900;letter-spacing:2px;color:#ff4500;font-size:18px}
 .logo span{color:#fff}
-.badge{background:linear-gradient(90deg,#ff4500,#ff8c00);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:900;box-shadow:0 0 15px #ff450088}
-.balBox{
-  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:8px 14px;
-  backdrop-filter:blur(10px)
-}
-.balBox small{color:#aaa;font-size:10px;display:block}
-.balBox b{color:#00ff88;font-size:16px}
+.badge{background:linear-gradient(90deg,#ff4500,#ff8c00);padding:3px 9px;border-radius:20px;font-size:11px;font-weight:900;margin-left:6px;box-shadow:0 0 15px #ff450088}
+.balBox{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:7px 12px;backdrop-filter:blur(10px);text-align:center}
+.balBox small{color:#aaa;font-size:9px;display:block;letter-spacing:1px}
+.balBox b{color:#00ff88;font-size:15px}
+.depBtnTop{padding:10px 16px;border-radius:12px;border:none;background:#fff;color:#000;font-weight:900;cursor:pointer;box-shadow:0 0 20px #ffffff22}
 
 .chartCard{
-  margin:14px;background:rgba(15,15,15,0.8);backdrop-filter:blur(15px);
-  border:1px solid rgba(255,255,255,0.08);border-radius:20px;overflow:hidden;
-  box-shadow:0 10px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,69,0,0.1) inset
+  margin:12px;background:rgba(15,15,15,0.85);backdrop-filter:blur(15px);
+  border:1px solid rgba(255,255,255,0.08);border-radius:22px;overflow:hidden;
+  box-shadow:0 15px 40px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,69,0,0.1)
 }
 .chartHead{
-  padding:14px 16px;display:flex;justify-content:space-between;align-items:center;
-  background:linear-gradient(90deg,rgba(255,69,0,0.15),transparent);border-bottom:1px solid rgba(255,255,255,0.06)
+  padding:12px 14px;display:flex;justify-content:space-between;align-items:center;
+  background:linear-gradient(90deg,rgba(255,69,0,0.18),transparent);border-bottom:1px solid rgba(255,255,255,0.06)
 }
-.liveDot{width:8px;height:8px;background:#00ff88;border-radius:50%;display:inline-block;animation:blink 1s infinite;box-shadow:0 0 10px #00ff88}
+.liveDot{width:8px;height:8px;background:#00ff88;border-radius:50%;display:inline-block;animation:blink 1s infinite;box-shadow:0 0 10px #00ff88;margin-right:6px}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
-#tv{height:420px;background:#000}
+#tv{height:55vh;min-height:380px;background:#000}
 
-.actionBox{
-  padding:16px;display:flex;flex-direction:column;gap:12px;
-  background:linear-gradient(180deg,rgba(20,20,20,0.9),rgba(10,10,10,0.9))
-}
-.stakeRow{display:flex;gap:10px}
+.actionBox{padding:14px;background:linear-gradient(180deg,rgba(22,22,22,0.95),rgba(10,10,10,0.95));display:flex;flex-direction:column;gap:12px}
+.stakeRow{display:flex;gap:8px}
 .stakeBtn{
-  flex:1;padding:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
-  border-radius:12px;color:#fff;text-align:center;cursor:pointer;transition:0.2s
+  flex:1;padding:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+  border-radius:12px;color:#bbb;text-align:center;cursor:pointer;transition:0.2s;font-weight:700;font-size:13px
 }
-.stakeBtn.active{background:linear-gradient(90deg,#ff4500,#ff8c00);border-color:#ff4500;box-shadow:0 0 20px #ff450044;color:#000;font-weight:900}
-
+.stakeBtn.active{background:linear-gradient(90deg,#ff8c42,#ff4500);border-color:#ff4500;box-shadow:0 0 20px #ff450055;color:#fff;font-weight:900;transform:scale(1.05)}
 .buyBtn{
   width:100%;padding:18px;border:none;border-radius:16px;
-  background:linear-gradient(90deg,#ff8c42,#ff4500);color:#fff;font-weight:900;font-size:18px;letter-spacing:1px;
-  box-shadow:0 8px 25px rgba(255,69,0,0.4), 0 0 0 1px rgba(255,255,255,0.1) inset;
-  cursor:pointer;transition:0.2s;position:relative;overflow:hidden
+  background:linear-gradient(90deg,#ff9a5a,#ff4500);color:#fff;font-weight:900;font-size:18px;letter-spacing:1px;
+  box-shadow:0 10px 28px rgba(255,69,0,0.45), inset 0 1px 0 rgba(255,255,255,0.2);cursor:pointer;transition:0.15s
 }
-.buyBtn:active{transform:scale(0.98)}
+.buyBtn:active{transform:scale(0.97)}
 .sellBtn{
-  width:100%;padding:16px;border:none;border-radius:16px;
-  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#ccc;
-  font-weight:900;font-size:15px;cursor:pointer;backdrop-filter:blur(10px)
+  width:100%;padding:15px;border-radius:16px;background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.14);color:#ddd;font-weight:900;font-size:14px;cursor:pointer;backdrop-filter:blur(10px)
 }
+.trades{margin:12px;background:rgba(15,15,15,0.75);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:14px;backdrop-filter:blur(12px)}
+.tradeItem{background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.09);border-radius:14px;padding:12px;margin-top:10px;display:flex;justify-content:space-between;align-items:center}
+.profit{color:#00ff88;font-weight:900}
+.loss{color:#ff4d4d;font-weight:900}
 
-.trades{margin:14px;background:rgba(15,15,15,0.7);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:14px;backdrop-filter:blur(10px)}
-.tradeItem{
-  background:linear-gradient(135deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));
-  border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px;margin-top:10px;
-  display:flex;justify-content:space-between;align-items:center
-}
-.depModal{
-  position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(15px);
-  display:none;justify-content:center;align-items:center;z-index:99
-}
-.depBox{
-  width:90%;max-width:360px;background:linear-gradient(135deg,#1a1a1a,#0f0f0f);border:1px solid rgba(255,69,0,0.3);
-  border-radius:24px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.8),0 0 40px rgba(255,69,0,0.15)
-}
-.inp{width:100%;padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.5);color:#fff;font-size:20px;text-align:center;font-weight:900;margin:14px 0}
+.depModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.88);backdrop-filter:blur(18px);display:none;justify-content:center;align-items:center;z-index:99}
+.depBox{width:92%;max-width:360px;background:linear-gradient(135deg,#1c1c1c,#0f0f0f);border:1px solid rgba(255,69,0,0.35);border-radius:26px;padding:24px;box-shadow:0 25px 70px rgba(0,0,0,0.9),0 0 50px rgba(255,69,0,0.18)}
+.inp{width:100%;padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.6);color:#fff;font-size:22px;text-align:center;font-weight:900;margin:14px 0}
 </style>
 </head>
 <body>
 
 <div class="top">
-<div class="logo">PIP<span>SCHEME</span> <span class="badge">PRO</span></div>
-<div class="balBox"><small>DEMO BALANCE</small><b id="bal">KSH 0</b></div>
-<div><button onclick="openDep()" style="padding:10px 16px;border-radius:12px;border:none;background:#fff;color:#000;font-weight:900;cursor:pointer">+ DEPOSIT</button></div>
+<div class="logo">PIPSCHEME<span style="color:#fff"> </span><span class="badge">PRO</span></div>
+<div class="balBox"><small>DEMO BALANCE</small><b id="bal">KSH 1,000</b></div>
+<button class="depBtnTop" onclick="openDep()">+ DEPOSIT</button>
 </div>
 
 <div class="chartCard">
 <div class="chartHead">
-<div><span class="liveDot"></span> <b id="symTxt">Euro / U.S. Dollar</b> <small style="color:#888"> • 5m</small></div>
-<div id="priceTxt" style="color:#00ff88;font-weight:900">1.12014</div>
+<div><span class="liveDot"></span><b id="symTxt">Euro / U.S. Dollar</b> <small style="color:#777"> • 5m • LIVE</small></div>
+<div id="priceTxt" style="color:#00ff88;font-weight:900;font-size:16px">1.12014</div>
 </div>
 <div id="tv"></div>
 <div class="actionBox">
 <div class="stakeRow" id="stakeRow">
-<div class="stakeBtn" onclick="setStake(100, this)">100</div>
-<div class="stakeBtn active" onclick="setStake(1000, this)">1K</div>
-<div class="stakeBtn" onclick="setStake(2500, this)">2.5K</div>
-<div class="stakeBtn" onclick="setStake(5000, this)">5K</div>
+<div class="stakeBtn" onclick="setStake(100,this)">100</div>
+<div class="stakeBtn active" onclick="setStake(1000,this)">1K</div>
+<div class="stakeBtn" onclick="setStake(2500,this)">2.5K</div>
+<div class="stakeBtn" onclick="setStake(5000,this)">5K</div>
 </div>
 <button class="buyBtn" onclick="trade('BUY')">BUY ▲</button>
 <button class="sellBtn" onclick="trade('SELL')">SELL ▼</button>
+<div style="display:flex;gap:8px">
+<select id="symbolSel" onchange="changeSym()" style="flex:1;padding:11px;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:10px">
+<option value="FX:EURUSD">EUR/USD</option>
+<option value="BINANCE:BTCUSDT">BTC/USD</option>
+<option value="OANDA:XAUUSD">GOLD</option>
+<option value="FX:GBPUSD">GBP/USD</option>
+</select>
+<button onclick="resetDemo()" style="padding:11px;background:#222;color:#666;border:1px solid #333;border-radius:10px;font-size:11px">RESET</button>
+</div>
 </div>
 </div>
 
 <div class="trades">
-<div style="display:flex;justify-content:space-between"><b style="color:#ff8c42">● Live Trades</b><small id="count" style="color:#666">0 open</small></div>
-<div id="list"><p style="color:#444;text-align:center;padding:30px">No trades yet.<br>Tap BUY or SELL to start</p></div>
+<div style="display:flex;justify-content:space-between;align-items:center"><b style="color:#ff8c42;font-size:13px">● Live Trades</b><small id="count" style="color:#666">0 open</small></div>
+<div id="list"><p style="color:#444;text-align:center;padding:32px;line-height:1.6">No trades yet.<br><span style="color:#666;font-size:12px">Tap BUY or SELL to start demo trading</span></p></div>
 </div>
 
 <div class="depModal" id="depModal">
 <div class="depBox">
 <h3 style="text-align:center">💳 Demo Deposit</h3>
-<p style="text-align:center;color:#666;font-size:13px;margin-top:6px">Add demo funds instantly</p>
-<input id="depAmt" class="inp" type="number" value="1000">
-<button class="buyBtn" onclick="doDep()">ADD KSH →</button>
-<button class="sellBtn" style="margin-top:10px" onclick="closeDep()">Cancel</button>
-</div>
-</div>
-
-<script src="https://s3.tradingview.com/tv.js"></script>
-<script>
-let bal = parseFloat(localStorage.getItem('ps_bal'))||0;
-let stake = 1000;
-let trades = JSON.parse(localStorage.getItem('ps_tr')||'[]');
-let price = 1.12014;
-
-function updBal(){document.getElementById('bal').innerText='KSH '+bal.toLocaleString();localStorage.setItem('ps_bal',bal)}
-updBal();
-function openDep(){document.getElementById('depModal').style.display='flex'}
-function closeDep(){document.getElementById('depModal').style.display='none'}
-function doDep(){let a=parseFloat(document.getElementById('depAmt').value)||0;if(a<100)r…
+<p style="text-align:center;color:#666;font-size:12px;margin-top:6px">Add demo funds instantly - no M-Pesa …
