@@ -1,7 +1,63 @@
-<div style="margin-top:20px;background:#0a0a0a;padding:15px;border-radius:15px;border:1px dashed #ff1a1a">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIPSCHEME - Trading</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{background:#070707;color:#fff;font-family:Arial;padding:15px}
+.card{background:#111;padding:20px;border-radius:15px;border:1px solid #222;margin:15px 0;max-width:500px;margin-left:auto;margin-right:auto}
+.balance{font-size:42px;color:#00e676;font-weight:900;text-align:center}
+input{width:100%;padding:12px;margin:10px 0;background:#111;border:1px solid #333;border-radius:10px;color:#fff}
+button{width:100%;padding:14px;border:none;border-radius:50px;font-weight:800;cursor:pointer;margin-top:8px}
+.btn-red{background:#ff1a1a;color:#fff}.btn-green{background:#00c853;color:#fff}
+</style>
+</head>
+<body>
+<div style="text-align:center;padding:20px"><h1 style="color:#ff1a1a">PIPSCHEME.CO.KE</h1><p>Dashboard</p></div>
+
+<div class="card">
+<div style="text-align:center">Balance: <div class="balance">KSH <span id="bal">0.00</span></div></div>
+<p style="text-align:center;color:#888;font-size:12px" id="userEmail">Loading...</p>
+</div>
+
+<div class="card" style="border:1px dashed #ff1a1a">
 <h4 style="color:#ff1a1a">DEPOSIT FUNDS</h4>
 <p style="font-size:12px;color:#888">Min 650 KSH - Instant to your PIPSCHEME wallet</p>
-<input id="mpesaPhone" placeholder="07XX XXX XXX" style="width:100%;padding:12px;margin:10px 0;background:#111;border:1px solid #333;border-radius:10px;color:#fff">
-<input id="amount" type="number" placeholder="650" style="width:100%;padding:12px;background:#111;border:1px solid #333;border-radius:10px;color:#fff">
-<button class="btn-red" onclick="deposit()" style="background:#00c853;margin-top:10px">DEPOSIT NOW via M-PESA</button>
+<input id="mpesaPhone" placeholder="07XX XXX XXX">
+<input id="amount" type="number" placeholder="650">
+<button class="btn-green" onclick="deposit()">DEPOSIT NOW via M-PESA</button>
 </div>
+
+<div class="card" style="padding:0;overflow:hidden">
+<div id="tv" style="height:380px"></div>
+<script src="https://s3.tradingview.com/tv.js"></script>
+<script>new TradingView.widget({"autosize":true,"symbol":"FX:EURUSD","interval":"5","timezone":"Africa/Nairobi","theme":"dark","style":"1","locale":"en","backgroundColor":"#111","gridColor":"rgba(255,26,26,0.1)","container_id":"tv"});</script>
+</div>
+
+<div class="card">
+<button class="btn-red" onclick="trade('BUY')">BUY ▲</button>
+<button style="background:#222;color:#fff" onclick="trade('SELL')">SELL ▼</button>
+</div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme",storageBucket:"pipscheme.firebasestorage.app",messagingSenderId:"555422651951",appId:"1:555422651951:web:db2d906848bee12d4958da"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(), db=firebase.firestore();
+let cur=null;
+auth.onAuthStateChanged(async u=>{if(!u){location.href='auth.html';return;}cur=u;document.getElementById('userEmail').innerText=u.email;const d=await db.collection('users').doc(u.uid).get();if(d.exists)document.getElementById('bal').innerText=(d.data().balance||0).toFixed(2);});
+
+async function deposit(){
+ const phone=document.getElementById('mpesaPhone').value;
+ const amt=parseFloat(document.getElementById('amount').value);
+ if(amt<650)return alert('Minimum 650 KSH');
+ await db.collection('deposits').add({uid:cur.uid,email:cur.email,phone,amount:amt,status:'completed',siteWallet:'PIPSCHEME_MAIN',timestamp:firebase.firestore.FieldValue.serverTimestamp()});
+ await db.collection('users').doc(cur.uid).update({balance:firebase.firestore.FieldValue.increment(amt),totalDeposits:firebase.firestore.FieldValue.increment(amt)});
+ alert('✅ Deposited '+amt+' KSH!'); location.reload();
+}
+function trade(t){alert(t+' order - Demo Mode');}
+</script>
+</body>
+</html>
