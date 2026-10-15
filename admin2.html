@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ADMIN2</title></head>
+<body style="background:black;color:white;font-family:Arial;text-align:center;padding-top:100px">
+<div id="a"><h1 style="color:red">ADMIN LOGIN</h1><input id="p" type="password" placeholder="password" style="padding:15px;width:250px"><br><br><button onclick="check()" style="padding:15px 40px;background:red;color:white;border:none;font-weight:bold">UNLOCK</button><p id="msg"></p></div>
+<div id="b" style="display:none"><h1 style="color:lime">IMEFUNGUKA! ✅</h1><p>Password ni sahihi. Sasa tunaweza kuweka dashboard yote.</p><button onclick="alert('Hapa ndipo tutaweka DISABLE accounts')">TEST DISABLE BUTTON</button></div>
+<script>
+function check(){
+ var pass = document.getElementById('p').value;
+ if(pass.trim() === "27367432"){
+   document.getElementById('a').style.display='none';
+   document.getElementById('b').style.display='block';
+ } else {
+   document.getElementById('msg').innerText = "Password sio sahihi! Umeweka: " + pass;
+ }
+}
+</script>
+</body></html>
