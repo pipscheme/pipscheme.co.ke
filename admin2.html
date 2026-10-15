@@ -1,17 +1,44 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ADMIN2</title></head>
-<body style="background:black;color:white;font-family:Arial;text-align:center;padding-top:100px">
-<div id="a"><h1 style="color:red">ADMIN LOGIN</h1><input id="p" type="password" placeholder="password" style="padding:15px;width:250px"><br><br><button onclick="check()" style="padding:15px 40px;background:red;color:white;border:none;font-weight:bold">UNLOCK</button><p id="msg"></p></div>
-<div id="b" style="display:none"><h1 style="color:lime">IMEFUNGUKA! ✅</h1><p>Password ni sahihi. Sasa tunaweza kuweka dashboard yote.</p><button onclick="alert('Hapa ndipo tutaweka DISABLE accounts')">TEST DISABLE BUTTON</button></div>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>SUPER ADMIN - PIPSCHEME</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>body{background:#050505;color:#fff;font-family:Arial;margin:0;padding:15px}input{width:100%;padding:14px;background:#1a1a1a;border:1px solid #333;border-radius:10px;color:#fff;margin:10px 0}button{padding:8px 12px;border:none;border-radius:8px;font-weight:800;cursor:pointer} .red{background:#ff1a1a;color:#fff} .green{background:#00c853;color:#fff} .dark{background:#222;color:#fff} .card{background:#111;border:1px solid #222;padding:15px;border-radius:12px;margin:10px 0} .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px} table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px solid #222;text-align:left;font-size:13px}</style>
+</head><body>
+
+<div id="login" style="max-width:400px;margin:80px auto;background:#111;padding:30px;border-radius:15px;border:1px solid #ff1a1a;text-align:center">
+<h2 style="color:#ff1a1a">PIPSCHEME SUPER ADMIN</h2><p style="color:#666;font-size:12px">admin2.html - PRIVATE</p><input id="p" type="password" placeholder="Admin Password"><button onclick="unlock()" style="width:100%;padding:14px;background:#ff1a1a;color:#fff;margin-top:10px">UNLOCK DASHBOARD</button><p id="msg" style="color:#ff4444;margin-top:10px"></p></div>
+
+<div id="dash" style="display:none">
+<h1 style="color:#ff1a1a">TOTAL RIGHTS CONTROL</h1><p style="color:#888">Link yako ya siri: /admin2.html | Pass: 27367432</p>
+<div class="grid"><div class="card"><h1 id="totalU">0</h1><p style="color:#888">Total Users</p></div><div class="card"><h1 id="activeU" style="color:#00ff88">0</h1><p style="color:#888">Active</p></div><div class="card"><h1 id="disU" style="color:#ff4444">0</h1><p style="color:#888">Disabled</p></div></div>
+<div class="card"><h2 style="color:#00ff88">💰 Total Money in Site: KSH <span id="totalCash">0</span></h2></div>
+<div class="card"><h3>👥 All Accounts (DISABLE fake/inactive)</h3><table><thead><tr><th>Email / ID</th><th>Balance</th><th>Status</th><th>Control</th></tr></thead><tbody id="userList"></tbody></table></div>
+<div class="card"><h3>💳 All Deposits</h3><table><thead><tr><th>Email</th><th>Amount</th><th>Phone</th></tr></thead><tbody id="depList"></tbody></table></div>
+</div>
+
 <script>
-function check(){
- var pass = document.getElementById('p').value;
- if(pass.trim() === "27367432"){
-   document.getElementById('a').style.display='none';
-   document.getElementById('b').style.display='block';
- } else {
-   document.getElementById('msg').innerText = "Password sio sahihi! Umeweka: " + pass;
- }
+const ADMIN_PASS="27367432";
+function unlock(){const v=document.getElementById('p').value.trim();if(v===ADMIN_PASS){document.getElementById('login').style.display='none';document.getElementById('dash').style.display='block';init();}else{document.getElementById('msg').innerText="Wrong Password! Umeweka: "+v;}}
+const firebaseConfig={apiKey:"AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme"};
+firebase.initializeApp(firebaseConfig);const db=firebase.firestore();
+function init(){
+ db.collection('users').onSnapshot(snap=>{
+   let total=snap.size, active=0, disabled=0, html="";
+   snap.forEach(doc=>{
+     const u=doc.data(); const isDis=u.isDisabled===true;
+     if(isDis) disabled++; else active++;
+     html+=`<tr><td>${u.email||doc.id}</td><td>${(u.balance||0).toFixed(2)}</td><td>${isDis?'<span style="background:#ff1a1a;padding:3px 8px;border-radius:10px;font-size:11px">DISABLED</span>':'<span style="background:#00c853;padding:3px 8px;border-radius:10px;font-size:11px">ACTIVE</span>'}</td><td>
+     ${isDis?<button class="green" onclick="enableAcc('${doc.id}')">ENABLE</button>:<button class="red" onclick="disableAcc('${doc.id}')">DISABLE</button>}
+     <button class="dark" onclick="deleteAcc('${doc.id}')">DELETE</button></td></tr>`;
+   });
+   document.getElementById('totalU').innerText=total;document.getElementById('activeU').innerText=active;document.getElementById('disU').innerText=disabled;document.getElementById('userList').innerHTML=html;
+ });
+ db.collection('deposits').orderBy('timestamp','desc').limit(100).onSnapshot(snap=>{
+   let total=0, html="";snap.forEach(d=>{const dd=d.data();total+=dd.amount||0;html+=<tr><td>${dd.email}</td><td style="color:#00ff88">${dd.amount}</td><td>${dd.phone||''}</td></tr>});
+   document.getElementById('totalCash').innerText=total.toFixed(2);document.getElementById('depList').innerHTML=html;
+ });
 }
-</script>
-</body></html>
+async function disableAcc(id){if(confirm('DISABLE huyu? Hataweza ku-login au ku-trade')){await db.collection('users').doc(id).update({isDisabled:true});}}
+async function enableAcc(id){await db.collection('users').doc(id).update({isDisabled:false});}
+async function deleteAcc(id){if(confirm('DELETE KABISA?')){await db.collection('users').doc(id).delete();}}
+</script></body></html>
