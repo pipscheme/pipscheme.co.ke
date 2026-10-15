@@ -1,140 +1,116 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIPSCHEME - Live Trading</title>
+<title>PIPSCHEME - Trade Live & Earn 15% Daily</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:#000;color:#fff}
-.header{background:#111;border-bottom:2px solid red;padding:15px;text-align:center;position:sticky;top:0;z-index:99}
-.header h1{color:red;letter-spacing:2px}
-.header h1 span{color:#fff}
-.hero{text-align:center;padding:25px 15px;background:linear-gradient(180deg,#1a0000,#000)}
-.hero h2{font-size:28px;margin-bottom:10px}
-.hero p{color:#aaa}
-.btn{padding:14px 25px;background:red;color:#fff;border:none;border-radius:12px;font-weight:900;margin:10px;cursor:pointer;text-decoration:none;display:inline-block}
-.btn.outline{background:transparent;border:2px solid red}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial}
+body{background:#070707;color:#fff;overflow-x:hidden}
+.top{
+  background:linear-gradient(90deg,#000,#111);border-bottom:2px solid #ff1a1a;
+  padding:14px 16px;display:flex;justify-content:center;align-items:center;
+  position:sticky;top:0;z-index:10;box-shadow:0 0 30px rgba(255,0,0,0.25)
+}
+.logo{font-weight:900;letter-spacing:3px;font-size:26px}
+.logo .r{color:#ff1a1a}
+.logo .w{color:#fff}
 
-/* CALCULATOR */
-.calc-box{background:linear-gradient(135deg,#0a0a0a,#1a0000);border:2px solid #ff0000;border-radius:20px;padding:20px;margin:20px 10px}
-.calc-box h2{color:red;text-align:center;margin-bottom:15px}
-.calc-input{width:100%;padding:16px;border-radius:12px;border:1px solid #444;background:#222;color:#fff;font-size:20px;text-align:center;font-weight:900}
-.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}
-.calc-card{background:#111;border:1px solid #333;border-radius:12px;padding:12px;text-align:center}
-.calc-card small{color:#888;display:block;font-size:11px}
-.calc-card b{color:#0f0;font-size:18px}
+.hero{
+  background: radial-gradient(ellipse at center, #1a0000 0%, #000 70%);
+  border-bottom:2px solid #ff1a1a;
+  padding:40px 16px;text-align:center;position:relative;overflow:hidden
+}
+.hero::before{
+  content:'';position:absolute;top:0;left:0;width:100%;height:100%;
+  background: linear-gradient(45deg, transparent 48%, rgba(255,0,0,0.08) 50%, transparent 52%);
+  background-size:200% 200%;animation:shine 3s linear infinite
+}
+@keyframes shine{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.hero h1{font-size:34px;font-weight:900;line-height:1.1;text-shadow:0 0 20px rgba(255,0,0,0.5)}
+.hero p{color:#bbb;margin-top:10px;font-size:14px}
+.btns{margin-top:20px;display:flex;gap:12px;justify-content:center}
+.btn-red{
+  background:linear-gradient(90deg,#ff1a1a,#ff4d4d);color:#fff;border:none;
+  padding:14px 28px;border-radius:14px;font-weight:900;font-size:15px;letter-spacing:1px;
+  box-shadow:0 8px 25px rgba(255,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.3);cursor:pointer;transition:0.2s
+}
+.btn-red:active{transform:scale(0.95)}
+.btn-outline{
+  background:transparent;color:#fff;border:2px solid #ff1a1a;
+  padding:12px 26px;border-radius:14px;font-weight:900;font-size:15px;cursor:pointer;
+  box-shadow:0 0 15px rgba(255,0,0,0.3);transition:0.2s
+}
+.btn-outline:hover{background:rgba(255,0,0,0.1)}
 
-/* TICKER */
-.ticker-wrap{background:#000;border-top:2px solid red;border-bottom:2px solid red;overflow:hidden;white-space:nowrap;padding:12px 0}
-.ticker-track{display:inline-block;animation:scroll 70s linear infinite}
-.ticker-item{display:inline-block;margin-right:50px;font-size:14px}
-.ticker-item span{color:#0f0;font-weight:900}
-.ticker-item.withdraw span{color:#ff4444}
-@keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.calcWrap{
+  margin:14px;background:linear-gradient(135deg,#0f0f0f,#000);border:2px solid #ff1a1a;
+  border-radius:20px;padding:18px;box-shadow:0 0 40px rgba(255,0,0,0.15), inset 0 0 20px rgba(255,0,0,0.05)
+}
+.calcTitle{text-align:center;color:#ff3b3b;font-weight:900;font-size:18px;letter-spacing:1px;margin-bottom:14px}
+.calcTitle span{filter:drop-shadow(0 0 10px #ff0000)}
+.inpBox{
+  background:linear-gradient(90deg,#1a1a1a,#222);border:1px solid #333;border-radius:14px;
+  padding:16px;text-align:center;font-size:26px;font-weight:900;color:#fff;
+  box-shadow:inset 0 2px 10px rgba(0,0,0,0.8)
+}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.card{
+  background:linear-gradient(135deg,#111,#000);border:1px solid #222;border-radius:14px;
+  padding:12px;text-align:center;position:relative;overflow:hidden
+}
+.card::after{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,#ff1a1a,transparent)}
+.card small{color:#777;font-size:10px;display:block;letter-spacing:1px}
+.card b{font-size:17px;font-weight:900}
+.green{color:#00ff66;text-shadow:0 0 10px #00ff66}
+.gold{color:#ffcc00;text-shadow:0 0 10px #ffcc00}
 
-/* CHART */
-.chart-box{margin:20px 10px;border:2px solid #222;border-radius:15px;overflow:hidden;background:#111}
-.chart-box .title{padding:12px;background:#111;color:red;font-weight:900;border-bottom:1px solid #222}
-#tradingview{height:420px}
-.features{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:15px}
-.feat{background:#111;border:1px solid #222;border-radius:12px;padding:15px;text-align:center}
-.feat b{display:block;color:red;margin-bottom:5px}
+.liveBar{
+  margin:14px;background:#111;border:1px solid #222;border-radius:14px;padding:10px 14px;
+  display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#aaa
+}
+.dot{width:8px;height:8px;background:#00ff66;border-radius:50%;display:inline-block;animation:blink 1s infinite;box-shadow:0 0 10px #00ff66}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
 </style>
 </head>
 <body>
 
-<div class="header">
-<h1>PIP<span>SCHEME</span></h1>
-</div>
+<div class="top"><div class="logo"><span class="r">PIP</span><span class="w">SCHEME</span></div></div>
 
 <div class="hero">
-<h2>Trade Live & Earn 15% Daily</h2>
+<h1>Trade Live & Earn <span style="color:#ff1a1a">15% Daily</span></h1>
 <p>Join 5,000+ traders in Kenya - M-Pesa Deposit</p>
-<a class="btn" href="auth.html">START NOW</a>
-<a class="btn outline" href="trading.html">LIVE CHART</a>
-</div>
-
-<!-- CALCULATOR -->
-<div class="calc-box">
-<h2>💰 PROFIT CALCULATOR</h2>
-<input id="investAmount" class="calc-input" type="number" value="1000" oninput="calcProfit()">
-<div class="calc-grid">
-<div class="calc-card"><small>DAILY (15%)</small><b id="daily">KSH 150</b></div>
-<div class="calc-card"><small>WEEKLY</small><b id="weekly">KSH 1,050</b></div>
-<div class="calc-card"><small>MONTHLY</small><b id="monthly">KSH 4,500</b></div>
-<div class="calc-card"><small>TOTAL RETURN</small><b id="totalRet" style="color:gold">KSH 5,500</b></div>
+<div class="btns">
+<button class="btn-red" onclick="location.href='trading.html'">START NOW</button>
+<button class="btn-outline" onclick="location.href='trading.html'">LIVE CHART</button>
 </div>
 </div>
 
-<!-- LIVE TICKER NA MAJINA YAKO -->
-<div class="ticker-wrap">
-<div class="ticker-track" id="tickerTrack"></div>
-</div>
+<div class="liveBar"><div><span class="dot"></span> <b style="color:#fff">5,247 Traders Online</b> - Last payout 2 min ago</div><div style="color:#00ff66;font-weight:900">KSH 847,320 Paid Today</div></div>
 
-<!-- LIVE CHART -->
-<div class="chart-box">
-<div class="title">📈 LIVE MARKET - BTC/USD • GOLD • EUR/USD</div>
-<div id="tradingview"></div>
+<div class="calcWrap">
+<div class="calcTitle">💰 PROFIT CALCULATOR</div>
+<input class="inpBox" type="number" id="amt" value="1000" oninput="calc()">
+<div class="grid">
+<div class="card"><small>DAILY (15%)</small><b class="green" id="daily">KSH 150</b></div>
+<div class="card"><small>WEEKLY</small><b class="green" id="weekly">KSH 1,050</b></div>
+<div class="card"><small>MONTHLY</small><b class="green" id="monthly">KSH 4,500</b></div>
+<div class="card"><small>TOTAL RETURN</small><b class="gold" id="total">KSH 5,500</b></div>
 </div>
-
-<div class="features">
-<div class="feat"><b>⚡ Instant</b>M-Pesa in 1 Min</div>
-<div class="feat"><b>🔒 Safe</b>Firebase Secured</div>
-<div class="feat"><b>💸 24/7</b>Withdraw Anytime</div>
+<button class="btn-red" style="width:100%;margin-top:14px;padding:16px;font-size:16px" onclick="location.href='trading.html'">TRADE WITH KSH <span id="btnAmt">1,000</span> →</button>
 </div>
-
-<div style="text-align:center;padding:20px">
-<a class="btn" href="auth.html">CREATE ACCOUNT →</a>
-<p style="color:#555;margin-top:15px;font-size:12px">© 2026 PIPSCHEME.CO.KE - All rights reserved</p>
-</div>
-
-<!-- TradingView Widget -->
-<script src="https://s3.tradingview.com/tv.js"></script>
-<script>
-new TradingView.widget({
-  "autosize": true,
-  "symbol": "BINANCE:BTCUSDT",
-  "interval": "5",
-  "timezone": "Africa/Nairobi",
-  "theme": "dark",
-  "style": "1",
-  "locale": "en",
-  "toolbar_bg": "#000",
-  "enable_publishing": false,
-  "hide_top_toolbar": false,
-  "container_id": "tradingview"
-});
-</script>
 
 <script>
-function calcProfit(){
-  let amt = parseFloat(document.getElementById('investAmount').value) || 0;
-  let daily = amt * 0.15;
-  document.getElementById('daily').innerText = 'KSH ' + daily.toLocaleString();
-  document.getElementById('weekly').innerText = 'KSH ' + (daily*7).toLocaleString();
-  document.getElementById('monthly').innerText = 'KSH ' + (daily*30).toLocaleString();
-  document.getElementById('totalRet').innerText = 'KSH ' + (amt + daily*30).toLocaleString();
+function calc(){
+  let a=parseFloat(document.getElementById('amt').value)||0;
+  document.getElementById('daily').innerText='KSH '+Math.round(a*0.15).toLocaleString();
+  document.getElementById('weekly').innerText='KSH '+Math.round(a*0.15*7).toLocaleString();
+  document.getElementById('monthly').innerText='KSH '+Math.round(a*0.15*30).toLocaleString();
+  document.getElementById('total').innerText='KSH '+Math.round(a*1.15*30/7*1.5).toLocaleString();
+  document.getElementById('btnAmt').innerText=a.toLocaleString();
+  document.querySelector('.inpBox').value=a;
 }
-calcProfit();
-
-const names = ["Brian","Erupe","Wanyonyi","Otieno","Mwangi","Branton","Kanairo Liquor","Njoroge","Achieng","Kipchoge","Chebet","Baraka","Shiko","Wafula","Omondi","Atieno","Kamau","Njoki","Onyango","Muthoni","Kevo","Stacy","Brayo","Faith","Dan","Mercy","Ezekiel","Linet","Karanja","Nyambura","Brian K.","Otieno O.","Mwangi J."];
-function genTicker(){
-  let html = "";
-  for(let i=0;i<35;i++){
-    let name = names[Math.floor(Math.random()*names.length)];
-    let masked = name.substring(0,2) + "*";
-    let isWithdraw = Math.random() > 0.6;
-    let amount = [500,650,1000,1500,2000,2500,3000,5000,7500,10000,12500][Math.floor(Math.random()*11)];
-    let cls = isWithdraw ? "withdraw" : "";
-    let act = isWithdraw ? "ametoa" : "ameweka";
-    if(!isWithdraw && Math.random()>0.7) act="amepata profit ya";
-    html += <div class="ticker-item ${cls}">${isWithdraw ? "💸" : "🔥"} ${masked} ${act} <span>KSH ${amount.toLocaleString()}</span> • </div>;
-  }
-  return html + html;
-}
-document.getElementById('tickerTrack').innerHTML = genTicker();
-setInterval(()=>{ document.getElementById('tickerTrack').innerHTML = genTicker(); }, 18000);
+calc();
 </script>
 </body>
 </html>
