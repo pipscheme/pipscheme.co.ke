@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PIPSCHEME ADMIN</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>body{background:#050505;color:#fff;font-family:Arial;padding:20px} .card{background:#111;border:1px solid #222;padding:15px;border-radius:12px;margin-bottom:10px} h1{color:#ff1a1a} table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px solid #222;text-align:left;font-size:13px} .green{color:#00ff88} .red{color:#ff4444}</style>
+</head><body>
+<h1>PIPSCHEME ADMIN - SITE WALLET</h1>
+<p style="color:#888">Total Deposits | All Users | Live</p>
+<div class="card"><h3>Total in Site Account: KSH <span id="total">0</span></h3></div>
+<div class="card"><table><thead><tr><th>Email</th><th>Phone</th><th>Amount</th><th>Time</th></tr></thead><tbody id="list"></tbody></table></div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme",storageBucket:"pipscheme.firebasestorage.app",messagingSenderId:"555422651951",appId:"1:555422651951:web:db2d906848bee12d4958da"};
+firebase.initializeApp(firebaseConfig);const db=firebase.firestore();
+db.collection('deposits').orderBy('timestamp','desc').onSnapshot(snap=>{
+ let total=0; let html="";
+ snap.forEach(doc=>{const d=doc.data();total+=d.amount; html+=`<tr><td>${d.email}</td><td>${d.phone}</td><td class="green">${d.amount}</td><td>${d.timestamp?new Date(d.timestamp.seconds*1000).toLocaleString():''}</td></tr>`});
+ document.getElementById('total').innerText=total.toFixed(2);
+ document.getElementById('list').innerHTML=html;
+});
+</script></body></html>
