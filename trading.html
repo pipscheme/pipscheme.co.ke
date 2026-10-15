@@ -1,63 +1,143 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIPSCHEME - Trading</title>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIPSCHEME PRO</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}body{background:#070707;color:#fff;font-family:Arial;padding:15px}
-.card{background:#111;padding:20px;border-radius:15px;border:1px solid #222;margin:15px 0;max-width:500px;margin-left:auto;margin-right:auto}
-.balance{font-size:42px;color:#00e676;font-weight:900;text-align:center}
-input{width:100%;padding:12px;margin:10px 0;background:#111;border:1px solid #333;border-radius:10px;color:#fff}
-button{width:100%;padding:14px;border:none;border-radius:50px;font-weight:800;cursor:pointer;margin-top:8px}
-.btn-red{background:#ff1a1a;color:#fff}.btn-green{background:#00c853;color:#fff}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial}
+body{
+  background: radial-gradient(ellipse at top left, #1a0a00 0%, #000000 40%, #0a001a 100%);
+  min-height:100vh;color:#fff;overflow-x:hidden;position:relative
+}
+/* ANIMATED GLOW BACKGROUND */
+body::before{
+  content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;
+  background: radial-gradient(circle at 20% 30%, rgba(255,69,0,0.15) 0%, transparent 50%),
+              radial-gradient(circle at 80% 70%, rgba(138,43,226,0.15) 0%, transparent 50%),
+              radial-gradient(circle at 50% 50%, rgba(255,0,80,0.08) 0%, transparent 60%);
+  animation: moveGlow 15s ease-in-out infinite;z-index:-1
+}
+@keyframes moveGlow{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-30px)}}
+
+.top{
+  backdrop-filter:blur(20px);background:rgba(20,20,20,0.7);border-bottom:1px solid rgba(255,80,0,0.3);
+  display:flex;justify-content:space-between;align-items:center;padding:14px 16px;position:sticky;top:0;z-index:10
+}
+.logo{font-weight:900;letter-spacing:2px;color:#ff4500}
+.logo span{color:#fff}
+.badge{background:linear-gradient(90deg,#ff4500,#ff8c00);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:900;box-shadow:0 0 15px #ff450088}
+.balBox{
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:8px 14px;
+  backdrop-filter:blur(10px)
+}
+.balBox small{color:#aaa;font-size:10px;display:block}
+.balBox b{color:#00ff88;font-size:16px}
+
+.chartCard{
+  margin:14px;background:rgba(15,15,15,0.8);backdrop-filter:blur(15px);
+  border:1px solid rgba(255,255,255,0.08);border-radius:20px;overflow:hidden;
+  box-shadow:0 10px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,69,0,0.1) inset
+}
+.chartHead{
+  padding:14px 16px;display:flex;justify-content:space-between;align-items:center;
+  background:linear-gradient(90deg,rgba(255,69,0,0.15),transparent);border-bottom:1px solid rgba(255,255,255,0.06)
+}
+.liveDot{width:8px;height:8px;background:#00ff88;border-radius:50%;display:inline-block;animation:blink 1s infinite;box-shadow:0 0 10px #00ff88}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+#tv{height:420px;background:#000}
+
+.actionBox{
+  padding:16px;display:flex;flex-direction:column;gap:12px;
+  background:linear-gradient(180deg,rgba(20,20,20,0.9),rgba(10,10,10,0.9))
+}
+.stakeRow{display:flex;gap:10px}
+.stakeBtn{
+  flex:1;padding:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;color:#fff;text-align:center;cursor:pointer;transition:0.2s
+}
+.stakeBtn.active{background:linear-gradient(90deg,#ff4500,#ff8c00);border-color:#ff4500;box-shadow:0 0 20px #ff450044;color:#000;font-weight:900}
+
+.buyBtn{
+  width:100%;padding:18px;border:none;border-radius:16px;
+  background:linear-gradient(90deg,#ff8c42,#ff4500);color:#fff;font-weight:900;font-size:18px;letter-spacing:1px;
+  box-shadow:0 8px 25px rgba(255,69,0,0.4), 0 0 0 1px rgba(255,255,255,0.1) inset;
+  cursor:pointer;transition:0.2s;position:relative;overflow:hidden
+}
+.buyBtn:active{transform:scale(0.98)}
+.sellBtn{
+  width:100%;padding:16px;border:none;border-radius:16px;
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#ccc;
+  font-weight:900;font-size:15px;cursor:pointer;backdrop-filter:blur(10px)
+}
+
+.trades{margin:14px;background:rgba(15,15,15,0.7);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:14px;backdrop-filter:blur(10px)}
+.tradeItem{
+  background:linear-gradient(135deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px;margin-top:10px;
+  display:flex;justify-content:space-between;align-items:center
+}
+.depModal{
+  position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(15px);
+  display:none;justify-content:center;align-items:center;z-index:99
+}
+.depBox{
+  width:90%;max-width:360px;background:linear-gradient(135deg,#1a1a1a,#0f0f0f);border:1px solid rgba(255,69,0,0.3);
+  border-radius:24px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.8),0 0 40px rgba(255,69,0,0.15)
+}
+.inp{width:100%;padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.5);color:#fff;font-size:20px;text-align:center;font-weight:900;margin:14px 0}
 </style>
 </head>
 <body>
-<div style="text-align:center;padding:20px"><h1 style="color:#ff1a1a">PIPSCHEME.CO.KE</h1><p>Dashboard</p></div>
 
-<div class="card">
-<div style="text-align:center">Balance: <div class="balance">KSH <span id="bal">0.00</span></div></div>
-<p style="text-align:center;color:#888;font-size:12px" id="userEmail">Loading...</p>
+<div class="top">
+<div class="logo">PIP<span>SCHEME</span> <span class="badge">PRO</span></div>
+<div class="balBox"><small>DEMO BALANCE</small><b id="bal">KSH 0</b></div>
+<div><button onclick="openDep()" style="padding:10px 16px;border-radius:12px;border:none;background:#fff;color:#000;font-weight:900;cursor:pointer">+ DEPOSIT</button></div>
 </div>
 
-<div class="card" style="border:1px dashed #ff1a1a">
-<h4 style="color:#ff1a1a">DEPOSIT FUNDS</h4>
-<p style="font-size:12px;color:#888">Min 650 KSH - Instant to your PIPSCHEME wallet</p>
-<input id="mpesaPhone" placeholder="07XX XXX XXX">
-<input id="amount" type="number" placeholder="650">
-<button class="btn-green" onclick="deposit()">DEPOSIT NOW via M-PESA</button>
+<div class="chartCard">
+<div class="chartHead">
+<div><span class="liveDot"></span> <b id="symTxt">Euro / U.S. Dollar</b> <small style="color:#888"> • 5m</small></div>
+<div id="priceTxt" style="color:#00ff88;font-weight:900">1.12014</div>
+</div>
+<div id="tv"></div>
+<div class="actionBox">
+<div class="stakeRow" id="stakeRow">
+<div class="stakeBtn" onclick="setStake(100, this)">100</div>
+<div class="stakeBtn active" onclick="setStake(1000, this)">1K</div>
+<div class="stakeBtn" onclick="setStake(2500, this)">2.5K</div>
+<div class="stakeBtn" onclick="setStake(5000, this)">5K</div>
+</div>
+<button class="buyBtn" onclick="trade('BUY')">BUY ▲</button>
+<button class="sellBtn" onclick="trade('SELL')">SELL ▼</button>
+</div>
 </div>
 
-<div class="card" style="padding:0;overflow:hidden">
-<div id="tv" style="height:380px"></div>
+<div class="trades">
+<div style="display:flex;justify-content:space-between"><b style="color:#ff8c42">● Live Trades</b><small id="count" style="color:#666">0 open</small></div>
+<div id="list"><p style="color:#444;text-align:center;padding:30px">No trades yet.<br>Tap BUY or SELL to start</p></div>
+</div>
+
+<div class="depModal" id="depModal">
+<div class="depBox">
+<h3 style="text-align:center">💳 Demo Deposit</h3>
+<p style="text-align:center;color:#666;font-size:13px;margin-top:6px">Add demo funds instantly</p>
+<input id="depAmt" class="inp" type="number" value="1000">
+<button class="buyBtn" onclick="doDep()">ADD KSH →</button>
+<button class="sellBtn" style="margin-top:10px" onclick="closeDep()">Cancel</button>
+</div>
+</div>
+
 <script src="https://s3.tradingview.com/tv.js"></script>
-<script>new TradingView.widget({"autosize":true,"symbol":"FX:EURUSD","interval":"5","timezone":"Africa/Nairobi","theme":"dark","style":"1","locale":"en","backgroundColor":"#111","gridColor":"rgba(255,26,26,0.1)","container_id":"tv"});</script>
-</div>
-
-<div class="card">
-<button class="btn-red" onclick="trade('BUY')">BUY ▲</button>
-<button style="background:#222;color:#fff" onclick="trade('SELL')">SELL ▼</button>
-</div>
-
 <script>
-const firebaseConfig={apiKey:"AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme",storageBucket:"pipscheme.firebasestorage.app",messagingSenderId:"555422651951",appId:"1:555422651951:web:db2d906848bee12d4958da"};
-firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth(), db=firebase.firestore();
-let cur=null;
-auth.onAuthStateChanged(async u=>{if(!u){location.href='auth.html';return;}cur=u;document.getElementById('userEmail').innerText=u.email;const d=await db.collection('users').doc(u.uid).get();if(d.exists)document.getElementById('bal').innerText=(d.data().balance||0).toFixed(2);});
+let bal = parseFloat(localStorage.getItem('ps_bal'))||0;
+let stake = 1000;
+let trades = JSON.parse(localStorage.getItem('ps_tr')||'[]');
+let price = 1.12014;
 
-async function deposit(){
- const phone=document.getElementById('mpesaPhone').value;
- const amt=parseFloat(document.getElementById('amount').value);
- if(amt<650)return alert('Minimum 650 KSH');
- await db.collection('deposits').add({uid:cur.uid,email:cur.email,phone,amount:amt,status:'completed',siteWallet:'PIPSCHEME_MAIN',timestamp:firebase.firestore.FieldValue.serverTimestamp()});
- await db.collection('users').doc(cur.uid).update({balance:firebase.firestore.FieldValue.increment(amt),totalDeposits:firebase.firestore.FieldValue.increment(amt)});
- alert('✅ Deposited '+amt+' KSH!'); location.reload();
-}
-function trade(t){alert(t+' order - Demo Mode');}
-</script>
-</body>
-</html>
+function updBal(){document.getElementById('bal').innerText='KSH '+bal.toLocaleString();localStorage.setItem('ps_bal',bal)}
+updBal();
+function openDep(){document.getElementById('depModal').style.display='flex'}
+function closeDep(){document.getElementById('depModal').style.display='none'}
+function doDep(){let a=parseFloat(document.getElementById('depAmt').value)||0;if(a<100)r…
