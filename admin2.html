@@ -1,54 +1,59 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ADMIN - TOTAL RIGHTS</title>
-<style>body{background:#000;color:#fff;font-family:Arial;padding:10px}input,button{width:100%;padding:14px;border-radius:10px;border:none;margin:5px 0}input{background:#222;color:#fff;border:1px solid #444}button{background:#ff1a1a;color:#fff;font-weight:900} .card{background:#111;padding:12px;border-radius:12px;border:1px solid #222;margin:10px 0;overflow:auto} table{width:100%;border-collapse:collapse} th,td{padding:8px;border-bottom:1px solid #222;font-size:12px;text-align:left} .dis{color:red;font-weight:700} .act{color:#00ff88}</style>
-</head><body>
-<div id="login" style="max-width:400px;margin:80px auto;background:#111;padding:20px;border-radius:15px;border:1px solid red;text-align:center"><h2 style="color:red">ADMIN LOGIN</h2><input id="p" type="password" placeholder="Password 27367432"><button onclick="unlock()">UNLOCK</button><p id="msg" style="color:orange"></p></div>
-<div id="dash" style="display:none"><h1 style="color:red">PIPSCHEME - TOTAL CONTROL</h1><p id="status" style="color:yellow">Connecting...</p>
-<div style="display:flex;gap:10px"><div class="card" style="flex:1"><h2 id="totalU">0</h2><p>Users</p></div><div class="card" style="flex:1"><h2 id="totalCash">0</h2><p>Total Balance</p></div></div>
-<div class="card"><h3>All Traders</h3><div id="userList">Loading...</div></div>
-<div class="card"><h3>Deposits Collection</h3><div id="depList">Loading...</div></div>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ADMIN</title>
+<style>body{background:#000;color:#fff;font-family:Arial;padding:10px}input,button{width:100%;padding:16px;border-radius:12px;border:none;margin:8px 0;font-size:16px}input{background:#222;color:#fff;border:1px solid #444}button{background:red;color:#fff;font-weight:900}</style>
+</head>
+<body>
+<div id="login" style="max-width:400px;margin:80px auto;background:#111;padding:20px;border-radius:15px;border:2px solid red;text-align:center">
+<h2 style="color:red">ADMIN LOGIN</h2>
+<input id="p" type="password" placeholder="27367432">
+<button onclick="myUnlock()">UNLOCK - BONZO HAPA</button>
+<p id="msg" style="color:yellow"></p>
+</div>
+<div id="dash" style="display:none">
+<h1 style="color:red">TOTAL CONTROL</h1><p id="status" style="color:yellow">Waiting...</p>
+<div id="userList" style="background:#111;padding:10px;border-radius:10px">Loading...</div>
 </div>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script>
-function unlock(){var p=document.getElementById('p').value.trim();if(p==="27367432"){document.getElementById('login').style.display='none';document.getElementById('dash').style.display='block';start();}else{document.getElementById('msg').innerText="Wrong!";}}
-async function start(){
- const status=document.getElementById('status');
- try{
-  status.innerText="Initializing Firebase...";
-  const cfg={apiKey:"AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme"};
-  if(!firebase.apps.length) firebase.initializeApp(cfg);
-  const auth=firebase.auth(); const db=firebase.firestore();
-  status.innerText="Signing in anonymously...";
-  await auth.signInAnonymously();
-  status.innerText="Connected! Loading users...";
-  
-  db.collection('users').onSnapshot(s=>{
-    let html="<table><tr><th>Email</th><th>Balance</th><th>Status</th><th>Actions</th></tr>"; let totalBal=0;
-    s.forEach(doc=>{
-      const u=doc.data(); totalBal+=(u.balance||0);
-      const isDis=u.isDisabled===true;
-      html+=`<tr><td style="word-break:break-all">${u.email||doc.id}</td><td>${u.balance||0}</td><td class="${isDis?'dis':'act'}">${isDis?'DISABLED':'ACTIVE'}</td><td>
-      ${isDis?<button onclick="enableUser('${doc.id}')" style="background:#00c853;width:auto;padding:6px 10px">ENABLE</button>:<button onclick="disableUser('${doc.id}')" style="background:red;width:auto;padding:6px 10px">DISABLE</button>}
-      <button onclick="deleteUser('${doc.id}')" style="background:#333;width:auto;padding:6px">DEL</button></td></tr>`;
-    });
-    html+="</table>";
-    document.getElementById('totalU').innerText=s.size;
-    document.getElementById('totalCash').innerText=totalBal;
-    document.getElementById('userList').innerHTML=html;
-    status.innerText="Loaded "+s.size+" users - Live";
-  },err=>{status.innerText="Error: "+err.message; document.getElementById('userList').innerHTML="<span style='color:red'>"+err.message+"</span>";});
-
-  db.collection('deposits').onSnapshot(s=>{
-    let html="<table><tr><th>Email</th><th>Amount</th></tr>"; s.forEach(d=>{const x=d.data(); html+=<tr><td>${x.email||d.id}</td><td>${x.amount||0}</td></tr>;});
-    html+="</table>"; if(s.empty) html="No deposits yet"; document.getElementById('depList').innerHTML=html;
-  });
-
-  window.disableUser=async(id)=>{if(confirm('DISABLE '+id+' ? Atabaki hawezi login')){await db.collection('users').doc(id).update({isDisabled:true}); alert('Disabled!');}}
-  window.enableUser=async(id)=>{await db.collection('users').doc(id).update({isDisabled:false}); alert('Enabled!');}
-  window.deleteUser=async(id)=>{if(confirm('DELETE KABISA '+id+'?')){await db.collection('users').doc(id).delete(); alert('Deleted');}}
-
- }catch(e){status.innerText="Error: "+e.message; alert(e.message);}
+function myUnlock(){
+  var val=document.getElementById('p').value.trim();
+  document.getElementById('msg').innerText="Umebonyeza: "+val;
+  if(val==="27367432"){
+    document.getElementById('login').style.display='none';
+    document.getElementById('dash').style.display='block';
+    startFirebase();
+  }else{
+    alert("Password sio sahihi! Umeandika: "+val);
+  }
 }
-</script></body></html>
+async function startFirebase(){
+  var status=document.getElementById('status');
+  try{
+    status.innerText="Initializing...";
+    var cfg={apiKey:"AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme"};
+    if(!firebase.apps.length) firebase.initializeApp(cfg);
+    var auth=firebase.auth(); var db=firebase.firestore();
+    status.innerText="Signing in...";
+    await auth.signInAnonymously();
+    status.innerText="Loading users...";
+    db.collection('users').onSnapshot(s=>{
+      var html="<table style='width:100%;color:#fff'><tr><th>Email</th><th>Bal</th><th>Action</th></tr>";
+      s.forEach(doc=>{
+        var u=doc.data();
+        var dis=u.isDisabled===true;
+        html+="<tr><td style='word-break:break-all;font-size:11px'>"+(u.email||doc.id)+"</td><td>"+(u.balance||0)+"</td><td>"+(dis?"<b style='color:red'>DISABLED</b>":"<span style='color:#0f0'>ACTIVE</span>")+"<br><button onclick=\"toggleDis('"+doc.id+"',"+(!dis)+")\" style='padding:6px;margin:2px;background:"+(dis?"green":"red")+"'>"+(dis?"ENABLE":"DISABLE")+"</button> <button onclick=\"delUser('"+doc.id+"')\" style='padding:6px;background:#333'>DEL</button></td></tr>";
+      });
+      html+="</table>";
+      document.getElementById('userList').innerHTML=html;
+      status.innerText="Loaded "+s.size+" users LIVE";
+    },e=>{status.innerText="ERR: "+e.message});
+    window.toggleDis=async(id,dis)=>{if(confirm((dis?"DISABLE":"ENABLE")+" "+id+"?")){await db.collection('users').doc(id).update({isDisabled:dis});}};
+    window.delUser=async(id)=>{if(confirm("DELETE "+id+"?")){await db.collection('users').doc(id).delete();}};
+  }catch(e){status.innerText="ERROR: "+e.message; alert(e.message);}
+}
+</script>
+</body>
+</html>
