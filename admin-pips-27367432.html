@@ -1,97 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIPSCHEME SUPER ADMIN</title>
+!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ADMIN</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}body{background:#050505;color:#fff;font-family:Arial,sans-serif;display:flex;min-height:100vh}
-.login{width:100%;max-width:400px;margin:auto;background:#111;padding:30px;border-radius:15px;border:1px solid #ff1a1a;text-align:center}
-.dash{display:none;width:100%;padding:20px}.show{display:block!important}
-input{width:100%;padding:12px;margin:10px 0;background:#222;border:1px solid #333;border-radius:10px;color:#fff}
-button{padding:10px 15px;border:none;border-radius:8px;font-weight:800;cursor:pointer}
-.btn-red{background:#ff1a1a;color:#fff}.btn-green{background:#00c853;color:#fff}.btn-dark{background:#222;color:#fff}
-.card{background:#111;border:1px solid #222;padding:15px;border-radius:12px;margin:10px 0}
-.stats{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
-table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px;border-bottom:1px solid #222;text-align:left}
-.badge{padding:3px 8px;border-radius:20px;font-size:11px}.active{background:#00c853}.disabled{background:#ff1a1a}
-@media(max-width:700px){.stats{grid-template-columns:1fr 1fr}}
-</style>
-</head>
-<body>
-
-<div id="loginBox" class="login">
-<h2 style="color:#ff1a1a">SUPER ADMIN LOGIN</h2>
-<p style="color:#666;font-size:12px;margin:10px 0">Private - pipscheme.co.ke</p>
-<input id="adminPass" type="password" placeholder="Enter Admin Password">
-<button class="btn-red" onclick="checkPass()" style="width:100%">UNLOCK DASHBOARD</button>
-<p id="err" style="color:#ff4444;margin-top:10px"></p>
-</div>
-
-<div id="dashBox" class="dash">
-<h1 style="color:#ff1a1a">PIPSCHEME - TOTAL CONTROL <span style="font-size:12px;color:#666">SECURE: admin-pips-27367432</span></h1>
-<div class="stats">
-<div class="card"><h3 id="totalUsers">0</h3><p style="color:#888">Total Users</p></div>
-<div class="card"><h3 id="activeUsers">0</h3><p style="color:#00ff88">Active</p></div>
-<div class="card"><h3 id="disabledUsers">0</h3><p style="color:#ff4444">Disabled</p></div>
-<div class="card"><h3 style="color:#00ff88">KSH <span id="totalMoney">0</span></h3><p style="color:#888">In Site Wallet</p></div>
-</div>
-
-<div class="card"><h3>💰 All Deposits (Site Account)</h3><table><thead><tr><th>Email</th><th>Phone</th><th>Amount</th><th>Time</th></tr></thead><tbody id="depositList"></tbody></table></div>
-
-<div class="card"><h3>👥 All Accounts - Disable / Enable</h3>
-<p style="font-size:12px;color:#888;margin-bottom:10px">Ukiona account sio active au sio halali, bonyeza DISABLE - hataweza ku-login tena.</p>
-<table><thead><tr><th>Email</th><th>Balance</th><th>Status</th><th>Action</th></tr></thead><tbody id="userList"></tbody></table></div>
-
-<button class="btn-dark" onclick="location.reload()" style="margin-top:20px">Logout</button>
-</div>
-
+<style>body{background:#070707;color:#fff;font-family:Arial;padding:15px}input{width:100%;padding:14px;margin:10px 0;background:#222;border:1px solid #333;border-radius:10px;color:#fff}button{width:100%;padding:14px;border:none;border-radius:10px;font-weight:800;background:#ff1a1a;color:#fff} .card{background:#111;padding:15px;border-radius:12px;border:1px solid #222;margin:10px 0} table{width:100%;font-size:13px} th,td{padding:8px;border-bottom:1px solid #222}</style>
+</head><body>
+<div id="login" style="max-width:400px;margin:100px auto;background:#111;padding:30px;border-radius:15px;border:1px solid #ff1a1a;text-align:center">
+<h2 style="color:#ff1a1a">SUPER ADMIN LOGIN</h2><input id="p" type="password" placeholder="Password 27367432"><button onclick="go()">UNLOCK DASHBOARD</button><p id="e" style="color:red"></p></div>
+<div id="dash" style="display:none"><h1 style="color:#ff1a1a">TOTAL CONTROL PANEL</h1>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="card"><h2 id="tU">0</h2><p>Total Users</p></div><div class="card"><h2 id="tD">0</h2><p>Total Deposits</p></div></div>
+<div class="card"><h3>Users - Disable / Enable</h3><table><thead><tr><th>Email</th><th>Balance</th><th>Action</th></tr></thead><tbody id="uL"></tbody></table></div>
+<div class="card"><h3>Deposits</h3><table><thead><tr><th>Email</th><th>Amount</th></tr></thead><tbody id="dL"></tbody></table></div></div>
 <script>
-const ADMIN_PASSWORD="27367432";
-const firebaseConfig={apiKey:"AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme",storageBucket:"pipscheme.firebasestorage.app",messagingSenderId:"555422651951",appId:"1:555422651951:web:db2d906848bee12d4958da"};
-firebase.initializeApp(firebaseConfig);
-const db=firebase.firestore();
-
-function checkPass(){
- if(document.getElementById('adminPass').value===ADMIN_PASSWORD){
-   document.getElementById('loginBox').style.display='none';
-   document.getElementById('dashBox').classList.add('show');
-   loadData();
- }else{ document.getElementById('err').innerText="Wrong Password!"; }
-}
-
-function loadData(){
- db.collection('users').onSnapshot(snap=>{
-   let total=snap.size, active=0, disabled=0; let html="";
-   snap.forEach(doc=>{
-     const u=doc.data();
-     const isDisabled=u.isDisabled===true;
-     if(isDisabled) disabled++; else active++;
-     html+=`<tr><td>${u.email||doc.id}</td><td>KSH ${(u.balance||0).toFixed(2)}</td><td><span class="badge ${isDisabled?'disabled':'active'}">${isDisabled?'DISABLED':'ACTIVE'}</span></td><td>
-     ${isDisabled?<button class="btn-green" onclick="enableUser('${doc.id}')">ENABLE</button>:<button class="btn-red" onclick="disableUser('${doc.id}')">DISABLE</button>}
-     <button class="btn-dark" onclick="deleteUser('${doc.id}')">DELETE</button></td></tr>`;
-   });
-   document.getElementById('totalUsers').innerText=total;
-   document.getElementById('activeUsers').innerText=active;
-   document.getElementById('disabledUsers').innerText=disabled;
-   document.getElementById('userList').innerHTML=html;
- });
- db.collection('deposits').orderBy('timestamp','desc').limit(100).onSnapshot(snap=>{
-   let total=0, html="";
-   snap.forEach(doc=>{
-     const d=doc.data(); total+=d.amount||0;
-     html+=<tr><td>${d.email}</td><td>${d.phone||''}</td><td style="color:#00ff88">${d.amount}</td><td>${d.timestamp?new Date(d.timestamp.seconds*1000).toLocaleString():''}</td></tr>;
-   });
-   document.getElementById('totalMoney').innerText=total.toFixed(2);
-   document.getElementById('depositList').innerHTML=html;
- });
-}
-
-async function disableUser(uid){ if(confirm('Disable this account? Hataweza ku-login.')){ await db.collection('users').doc(uid).update({isDisabled:true}); } }
-async function enableUser(uid){ await db.collection('users').doc(uid).update({isDisabled:false}); }
-async function deleteUser(uid){ if(confirm('FUTA KABISA? Hii hairudi!')){ await db.collection('users').doc(uid).delete(); } }
-</script>
-</body>
-</html>
+const PASS="27367432";
+function go(){const v=document.getElementById('p').value.trim();if(v===PASS){document.getElementById('login').style.display='none';document.getElementById('dash').style.display='block';load();}else{document.getElementById('e').innerText='Wrong! Imebaki: '+v;}}
+const firebaseConfig={apiKey:"AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme"};
+firebase.initializeApp(firebaseConfig);const db=firebase.firestore();
+function load(){db.collection('users').onSnapshot(s=>{document.getElementById('tU').innerText=s.size;let h="";s.forEach(d=>{const u=d.data();h+=<tr><td>${u.email||d.id}</td><td>${u.balance||0}</td><td><button onclick="dis('${d.id}')" style="padding:5px;background:#ff1a1a;width:auto">DISABLE</button> <button onclick="en('${d.id}')" style="padding:5px;background:#00c853;width:auto">ENABLE</button> <button onclick="del('${d.id}')" style="padding:5px;background:#333;width:auto">DEL</button></td></tr>});document.getElementById('uL').innerHTML=h;});db.collection('deposits').onSnapshot(s=>{let tot=0,h="";s.forEach(d=>{tot+=d.data().amount||0;h+=<tr><td>${d.data().email}</td><td>${d.data().amount}</td></tr>});document.getElementById('tD').innerText='KSH '+tot;document.getElementById('dL').innerHTML=h;});}
+async function dis(id){await db.collection('users').doc(id).update({isDisabled:true});alert('Disabled');}
+async function en(id){await db.collection('users').doc(id).update({isDisabled:false});alert('Enabled');}
+async function del(id){if(confirm('Delete?'))await db.collection('users').doc(id).delete();}
+</script></body></html>
