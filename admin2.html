@@ -1,52 +1,54 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ADMIN</title>
-<script>
-function unlock(){
-  var p=document.getElementById('p').value.trim();
-  if(p==="27367432"){
-    document.getElementById('login').style.display='none';
-    document.getElementById('dash').style.display='block';
-    startFirebase();
-  } else {
-    document.getElementById('msg').innerText="Wrong! Umeandika: "+p;
-  }
-}
-</script>
+<script>function unlock(){var p=document.getElementById('p').value.trim();if(p==="27367432"){document.getElementById('login').style.display='none';document.getElementById('dash').style.display='block';startFirebase();}else{document.getElementById('msg').innerText="Wrong! Umeandika: "+p;}}</script>
 <style>body{background:#070707;color:#fff;font-family:Arial;padding:15px}input,button{padding:14px;border-radius:10px;border:none;width:100%;margin:8px 0}input{background:#222;color:#fff;border:1px solid #333}button{background:#ff1a1a;color:#fff;font-weight:800} .card{background:#111;padding:15px;border-radius:12px;border:1px solid #222;margin:10px 0} table{width:100%} th,td{padding:8px;border-bottom:1px solid #222;font-size:13px}</style>
 </head><body>
 <div id="login" style="max-width:380px;margin:100px auto;background:#111;padding:25px;border-radius:15px;border:1px solid red;text-align:center"><h2 style="color:red">ADMIN LOGIN</h2><input id="p" type="password" placeholder="27367432"><button onclick="unlock()">UNLOCK DASHBOARD</button><p id="msg" style="color:orange"></p></div>
 
 <div id="dash" style="display:none">
-<h1 style="color:red">TOTAL RIGHTS PANEL</h1>
-<div style="display:flex;gap:10px"><div class="card" style="flex:1"><h2 id="totalU">...</h2><p>Users</p></div><div class="card" style="flex:1"><h2 id="totalCash">...</h2><p>Total Deposits</p></div></div>
-<div class="card"><table><thead><tr><th>Email</th><th>Bal</th><th>Status</th><th>Action</th></tr></thead><tbody id="userList"><tr><td colspan=4>Loading...</td></tr></tbody></table></div>
+<h1 style="color:red">TOTAL RIGHTS PANEL</h1><p id="status" style="color:yellow">Connecting to Firebase...</p>
+<div style="display:flex;gap:10px"><div class="card" style="flex:1"><h2 id="totalU">0</h2><p>Users</p></div><div class="card" style="flex:1"><h2 id="totalCash">KSH 0</h2><p>Total Deposits</p></div></div>
+<div class="card"><table><thead><tr><th>Email</th><th>Bal</th><th>Status</th><th>Action</th></tr></thead><tbody id="userList"><tr><td colspan=4>Connecting...</td></tr></tbody></table></div>
 <div class="card"><h3>Deposits</h3><table><tbody id="depList"></tbody></table></div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script>
-function startFirebase(){
+async function startFirebase(){
   try{
+    document.getElementById('status').innerText="Initializing...";
     const cfg={apiKey:"AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme"};
     if(!firebase.apps.length) firebase.initializeApp(cfg);
-    const db=firebase.firestore();
+    const auth=firebase.auth(); const db=firebase.firestore();
+    // Anonymous login ndio rules ziruhusu
+    await auth.signInAnonymously();
+    document.getElementById('status').innerText="Connected as Anonymous - Loading users...";
+    
     db.collection('users').onSnapshot(s=>{
+      document.getElementById('status').innerText="Loaded "+s.size+" users";
       let html=""; s.forEach(doc=>{
         const u=doc.data(); const dis=u.isDisabled===true;
-        html+=<tr><td>${u.email||doc.id}</td><td>${u.balance||0}</td><td>${dis?'DISABLED':'ACTIVE'}</td><td>${dis?<button onclick="enableAcc('${doc.id}')" style="background:#00c853;width:auto;padding:5px 10px">ENABLE</button>:<button onclick="disableAcc('${doc.id}')" style="background:#ff1a1a;width:auto;padding:5px 10px">DISABLE</button>} <button onclick="deleteAcc('${doc.id}')" style="background:#333;width:auto;padding:5px 10px">DEL</button></td></tr>;
+        html+=<tr><td style="word-break:break-all">${u.email||doc.id.substring(0,15)}</td><td>${(u.balance||0).toFixed?u.balance.toFixed(0):u.balance||0}</td><td>${dis?'<span style="color:red">DISABLED</span>':'<span style="color:lime">ACTIVE</span>'}</td><td>${dis?<button onclick="enableAcc('${doc.id}')" style="background:#00c853;width:auto;padding:5px 8px">ENABLE</button>:<button onclick="disableAcc('${doc.id}')" style="background:#ff1a1a;width:auto;padding:5px 8px">DISABLE</button>} <button onclick="deleteAcc('${doc.id}')" style="background:#333;width:auto;padding:5px 8px">DEL</button></td></tr>;
       });
+      if(s.empty) html="<tr><td colspan=4>No users found in 'users' collection. Check kama collection inaitwa 'users' au 'Users'</td></tr>";
       document.getElementById('totalU').innerText=s.size+" Users";
       document.getElementById('userList').innerHTML=html;
+    }, err=>{
+      document.getElementById('status').innerText="Error users: "+err.message;
+      document.getElementById('userList').innerHTML="<tr><td colspan=4 style='color:red'>"+err.message+"<br><br>Enda Firebase Console > Firestore > Rules > weka: allow read, write: if true;</td></tr>";
     });
+
     db.collection('deposits').onSnapshot(s=>{
-      let tot=0, h=""; s.forEach(d=>{tot+=d.data().amount||0; h+=<tr><td>${d.data().email}</td><td>${d.data().amount}</td></tr>});
+      let tot=0, h=""; s.forEach(d=>{tot+=d.data().amount||0; h+=<tr><td>${d.data().email||'?'}</td><td style="color:#00ff88">${d.data().amount}</td></tr>});
       document.getElementById('totalCash').innerText="KSH "+tot; document.getElementById('depList').innerHTML=h;
     });
-    window.disableAcc=async(id)=>{if(confirm('Disable?')) await db.collection('users').doc(id).update({isDisabled:true})}
+
+    window.disableAcc=async(id)=>{if(confirm('DISABLE huyu?')) await db.collection('users').doc(id).update({isDisabled:true})}
     window.enableAcc=async(id)=>{await db.collection('users').doc(id).update({isDisabled:false})}
-    window.deleteAcc=async(id)=>{if(confirm('Delete kabisa?')) await db.collection('users').doc(id).delete()}
-  }catch(e){alert("Firebase Error: "+e.message)}
+    window.deleteAcc=async(id)=>{if(confirm('DELETE KABISA?')) await db.collection('users').doc(id).delete()}
+  }catch(e){document.getElementById('status').innerText="Firebase Error: "+e.message; alert(e.message)}
 }
 </script>
 </body></html>
