@@ -1,58 +1,71 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ADMIN</title>
-<style>body{background:#000;color:#fff;font-family:Arial;padding:10px}input,button{width:100%;padding:16px;border-radius:12px;border:none;margin:8px 0;font-size:16px}input{background:#222;color:#fff;border:1px solid #444}button{background:red;color:#fff;font-weight:900}</style>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ADMIN</title>
+<style>
+body{background:#000;color:#fff;font-family:Arial;padding:10px}
+input,button{width:100%;padding:16px;border-radius:12px;border:none;margin:8px 0;font-size:16px}
+input{background:#222;color:#fff;border:1px solid #555}
+button{background:red;color:#fff;font-weight:900;cursor:pointer}
+.card{background:#111;padding:12px;border-radius:12px;border:1px solid #222;margin:10px 0}
+table{width:100%;border-collapse:collapse}
+th,td{padding:8px;border-bottom:1px solid #222;font-size:12px;text-align:left}
+</style>
 </head>
 <body>
+
 <div id="login" style="max-width:400px;margin:80px auto;background:#111;padding:20px;border-radius:15px;border:2px solid red;text-align:center">
 <h2 style="color:red">ADMIN LOGIN</h2>
-<input id="p" type="password" placeholder="27367432">
-<button onclick="myUnlock()">UNLOCK - BONZO HAPA</button>
+<input id="p" type="password" placeholder="Password 27367432">
+<button onclick="unlockNow()">UNLOCK</button>
 <p id="msg" style="color:yellow"></p>
 </div>
+
 <div id="dash" style="display:none">
-<h1 style="color:red">TOTAL CONTROL</h1><p id="status" style="color:yellow">Waiting...</p>
-<div id="userList" style="background:#111;padding:10px;border-radius:10px">Loading...</div>
+<h1 style="color:red">PIPSCHEME CONTROL</h1>
+<p id="status" style="color:yellow">Waiting...</p>
+<div id="userList" class="card">Loading users...</div>
 </div>
+
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script>
-function myUnlock(){
-  var val=document.getElementById('p').value.trim();
-  document.getElementById('msg').innerText="Umebonyeza: "+val;
-  if(val==="27367432"){
+function unlockNow(){
+  var v=document.getElementById('p').value.trim();
+  if(v==="27367432"){
     document.getElementById('login').style.display='none';
     document.getElementById('dash').style.display='block';
-    startFirebase();
+    start();
   }else{
-    alert("Password sio sahihi! Umeandika: "+val);
+    document.getElementById('msg').innerText="Wrong password: "+v;
+    alert("Wrong!");
   }
 }
-async function startFirebase(){
+async function start(){
   var status=document.getElementById('status');
   try{
-    status.innerText="Initializing...";
     var cfg={apiKey:"AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme"};
     if(!firebase.apps.length) firebase.initializeApp(cfg);
-    var auth=firebase.auth(); var db=firebase.firestore();
-    status.innerText="Signing in...";
-    await auth.signInAnonymously();
-    status.innerText="Loading users...";
+    var db=firebase.firestore();
+    await firebase.auth().signInAnonymously();
+    status.innerText="Connected! Loading...";
     db.collection('users').onSnapshot(s=>{
-      var html="<table style='width:100%;color:#fff'><tr><th>Email</th><th>Bal</th><th>Action</th></tr>";
-      s.forEach(doc=>{
-        var u=doc.data();
+      var html="<table><tr><th>Email</th><th>Balance</th><th>Action</th></tr>";
+      s.forEach(d=>{
+        var u=d.data();
         var dis=u.isDisabled===true;
-        html+="<tr><td style='word-break:break-all;font-size:11px'>"+(u.email||doc.id)+"</td><td>"+(u.balance||0)+"</td><td>"+(dis?"<b style='color:red'>DISABLED</b>":"<span style='color:#0f0'>ACTIVE</span>")+"<br><button onclick=\"toggleDis('"+doc.id+"',"+(!dis)+")\" style='padding:6px;margin:2px;background:"+(dis?"green":"red")+"'>"+(dis?"ENABLE":"DISABLE")+"</button> <button onclick=\"delUser('"+doc.id+"')\" style='padding:6px;background:#333'>DEL</button></td></tr>";
+        html+="<tr><td style='word-break:break-all'>"+(u.email||d.id)+"</td><td>"+(u.balance||0)+"</td><td>"+(dis?"<b style='color:red'>DISABLED</b>":"<span style='color:#0f0'>ACTIVE</span>")+"<br><button onclick=\"doToggle('"+d.id+"',"+!dis+")\" style='padding:6px;width:auto;background:"+(dis?"green":"red")+"'>"+(dis?"ENABLE":"DISABLE")+"</button> <button onclick=\"doDel('"+d.id+"')\" style='padding:6px;width:auto;background:#333'>DEL</button></td></tr>";
       });
       html+="</table>";
       document.getElementById('userList').innerHTML=html;
-      status.innerText="Loaded "+s.size+" users LIVE";
-    },e=>{status.innerText="ERR: "+e.message});
-    window.toggleDis=async(id,dis)=>{if(confirm((dis?"DISABLE":"ENABLE")+" "+id+"?")){await db.collection('users').doc(id).update({isDisabled:dis});}};
-    window.delUser=async(id)=>{if(confirm("DELETE "+id+"?")){await db.collection('users').doc(id).delete();}};
-  }catch(e){status.innerText="ERROR: "+e.message; alert(e.message);}
+      status.innerText="Loaded "+s.size+" users";
+    });
+    window.doToggle=async(id,val)=>{if(confirm("Change "+id+"?")){await db.collection('users').doc(id).update({isDisabled:val})}};
+    window.doDel=async(id)=>{if(confirm("DELETE "+id+"?")){await db.collection('users').doc(id).delete()}};
+  }catch(e){status.innerText=e.message; alert(e.message)}
 }
 </script>
 </body>
