@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIPSCHEME - Best Trading Platform in Kenya</title>
+<title>PIPSCHEME - Best Trading Platform Kenya</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -10,42 +10,47 @@
 <style>
 :root{--green:#00ff88;--red:#ff1a1a;--bg:#080a0c;--card:#13161a}
 *{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:#fff;font-family:'Space Grotesk',sans-serif;overflow-x:hidden}
-.header{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;background:var(--card);border-bottom:1px solid #222;position:sticky;top:0;z-index:99}
-.logo{font-weight:900;font-size:22px;letter-spacing:-1px}.logo span{color:var(--green)}
-.bal-box{background:#000;border:1px solid #222;padding:6px 12px;border-radius:20px;font-size:13px;display:flex;gap:10px;align-items:center}
+.header{display:flex;justify-content:space-between;align-items:center;padding:12px 12px;background:var(--card);border-bottom:1px solid #222;position:sticky;top:0;z-index:99}
+.logo{font-weight:900;font-size:20px;letter-spacing:-1px}.logo span{color:var(--green)}
+.bal-box{background:#000;border:1px solid #222;padding:5px 10px;border-radius:20px;font-size:12px;display:flex;gap:8px;align-items:center}
 .switch{display:flex;background:#000;border-radius:20px;padding:2px;border:1px solid #222}
-.switch button{padding:5px 12px;border-radius:20px;border:none;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:#666}
+.switch button{padding:5px 10px;border-radius:20px;border:none;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:#666}
 .switch button.active{background:var(--green);color:#000}
-.chart-wrap{height:52vh;background:#000;position:relative}
+.chart-wrap{height:50vh;background:#000;position:relative}
 .controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px}
 .btn{padding:16px;border:none;border-radius:12px;font-weight:900;font-size:15px;cursor:pointer}
 .buy{background:var(--green);color:#000}.sell{background:var(--red);color:#fff}
 .card{background:var(--card);margin:10px;border-radius:14px;padding:14px;border:1px solid #222}
 .input{width:100%;padding:12px;background:#000;border:1px solid #333;border-radius:10px;color:#fff;margin:8px 0}
 .profit{color:var(--green);font-weight:900}.loss{color:var(--red)}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:999;padding:15px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;z-index:999;padding:15px}
 .modal-box{background:#111;border:1px solid #333;border-radius:16px;padding:20px;width:100%;max-width:380px}
-.tabs{display:flex;gap:5px;margin:10px 0}.tab{flex:1;padding:8px;background:#000;border:1px solid #222;border-radius:8px;color:#888;font-size:12px}
+.tabs{display:flex;gap:5px;margin:10px 0}.tab{flex:1;padding:8px;background:#000;border:1px solid #222;border-radius:8px;color:#888;font-size:12px;cursor:pointer}
 .tab.active{color:var(--green);border-color:var(--green)}
+.logoutBtn{background:#222;color:#888;border:none;padding:6px 10px;border-radius:10px;font-size:11px;cursor:pointer}
 </style>
 </head>
 <body>
 
 <div class="header">
-<div class="logo">PIP<span>SCHEME</span>.CO.KE</div>
-<div style="display:flex;gap:8px;align-items:center">
+<div>
+<div class="logo">PIP<span>SCHEME</span></div>
+<div id="userInfo" style="font-size:10px;color:#666">Loading...</div>
+</div>
+<div style="display:flex;gap:6px;align-items:center">
 <div class="switch"><button id="demoBtn" class="active" onclick="setMode('demo')">DEMO</button><button id="realBtn" onclick="setMode('real')">REAL</button></div>
-<div class="bal-box"><span id="bal">KSH 0</span> <button onclick="openDeposit()" style="background:var(--green);border:none;padding:4px 10px;border-radius:20px;font-weight:800;font-size:11px">+</button></div>
+<div class="bal-box"><span id="bal">KSH 0</span><button onclick="openDeposit()" style="background:var(--green);border:none;padding:4px 10px;border-radius:20px;font-weight:800;font-size:11px">+</button></div>
+<button class="logoutBtn" onclick="logout()">LOGOUT</button>
 </div>
 </div>
 
-<div class="chart-wrap">
-<div id="tradingview" style="height:100%"></div>
-</div>
+<div style="text-align:center;padding:4px;background:#000;border-bottom:1px solid #222;font-size:11px;color:#888" id="realStatus">DEMO ACCOUNT - KSH 10,000 Practice Money</div>
+
+<div class="chart-wrap"><div id="tradingview" style="height:100%"></div></div>
 
 <div style="padding:0 10px;display:flex;gap:10px">
-<div class="card" style="flex:1;margin:10px 0"><small style="color:#666">AMOUNT</small><input id="amount" class="input" type="number" value="100" style="margin:4px 0 0 0"></div>
-<div class="card" style="flex:1;margin:10px 0"><small style="color:#666">PROFIT IF WIN</small><div id="profitPreview" class="profit" style="font-size:18px;margin-top:6px">+ KSH 85</div></div>
+<div class="card" style="flex:1;margin:10px 0"><small style="color:#666">AMOUNT (KSH)</small><input id="amount" class="input" type="number" value="100" style="margin:4px 0 0 0"></div>
+<div class="card" style="flex:1;margin:10px 0"><small style="color:#666">PROFIT IF WIN 85%</small><div id="profitPreview" class="profit" style="font-size:18px;margin-top:6px">+ KSH 85</div></div>
 </div>
 
 <div class="controls">
@@ -54,76 +59,116 @@
 </div>
 
 <div class="card">
-<div class="tabs"><button class="tab active">Open Trades</button><button class="tab" onclick="openHistory()">History</button><button class="tab" onclick="openReferral()">Refer & Earn 200</button></div>
-<div id="tradesList" style="font-size:13px;color:#888;text-align:center;padding:20px">No open trades. Place BUY/SELL to start.</div>
+<div class="tabs"><button class="tab active">Live Trades</button><button class="tab" onclick="location.href='history.html'">History</button><button class="tab" onclick="openReferral()">Referral</button></div>
+<div id="tradesList" style="font-size:13px;color:#888;text-align:center;padding:20px">No trades yet. Learn on DEMO, then switch to REAL to make money.</div>
 </div>
 
-<div class="card" style="text-align:center">
-<p style="font-size:11px;color:#555">Risk Disclosure: Trading involves risk. PIPSCHEME is registered Business Name BN-6ASRZP2L. Trade responsibly. Support: WhatsApp +254</p>
-</div>
+<div class="card" style="text-align:center"><p style="font-size:10px;color:#555">PIPSCHEME - BN-6ASRZP2L - Minimum Deposit KSH 650 - Risk: Trading involves risk. Demo ≠ Real profit.</p></div>
 
 <!-- DEPOSIT MODAL -->
 <div id="depModal" class="modal"><div class="modal-box">
-<h3 style="color:var(--green)">Deposit - M-Pesa</h3>
-<p style="font-size:12px;color:#888;margin:8px 0">Paybill: <b style="color:#fff">522522</b> Acc: <b style="color:#fff">1286737</b> (au Lipa na M-Pesa direct)</p>
-<input id="depAmount" class="input" placeholder="Amount KSH (min 100)">
-<input id="mpesaCode" class="input" placeholder="M-Pesa Code e.g QJD...">
-<button class="btn buy" style="width:100%" onclick="submitDeposit()">I HAVE PAID - CONFIRM</button>
+<h3 style="color:var(--green)">Deposit to REAL Account</h3>
+<div style="background:#000;padding:10px;border-radius:10px;margin:10px 0;border:1px dashed #333">
+<p style="font-size:12px;color:#fff">1. Go to M-Pesa -> Lipa na M-Pesa -> Paybill</p>
+<p style="font-size:13px;color:#00ff88">Paybill: 522522 | Acc: 1286737</p>
+<p style="font-size:12px;color:#fff">2. Amount: <b>MINIMUM KSH 650</b></p>
+<p style="font-size:12px;color:#888">3. Copy M-Pesa code after paying</p>
+</div>
+<input id="depAmount" class="input" type="number" placeholder="Amount (Min 650)">
+<input id="mpesaCode" class="input" placeholder="M-Pesa Code e.g QJD8...">
+<button class="btn buy" style="width:100%" onclick="submitDeposit()">I HAVE PAID KSH 650+ - CONFIRM</button>
 <button onclick="closeDeposit()" style="width:100%;background:transparent;color:#666;border:none;margin-top:10px">Cancel</button>
-<p id="depMsg" style="font-size:12px;margin-top:10px"></p>
+<p id="depMsg" style="font-size:12px;margin-top:10px;color:#00ff88"></p>
 </div></div>
 
 <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 <script>
 const firebaseConfig={apiKey:"AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme"};
 firebase.initializeApp(firebaseConfig);const auth=firebase.auth();const db=firebase.firestore();
-let mode='demo', balanceDemo=10000, balanceReal=0, currentUser=null;
+let mode='demo', balanceDemo=10000, balanceReal=0, currentUser=null, username="";
 
-new TradingView.widget({"autosize":true,"symbol":"FX:EURUSD","interval":"1","timezone":"Africa/Nairobi","theme":"dark","style":"1","locale":"en","toolbar_bg":"#000","enable_publishing":false,"hide_top_toolbar":false,"save_image":false,"container_id":"tradingview"});
+new TradingView.widget({"autosize":true,"symbol":"FX:EURUSD","interval":"1","timezone":"Africa/Nairobi","theme":"dark","style":"1","locale":"en","toolbar_bg":"#000","enable_publishing":false,"container_id":"tradingview"});
 
 auth.onAuthStateChanged(async user=>{
   if(!user){ window.location.href='login.html'; return; }
   currentUser=user;
   const doc=await db.collection('users').doc(user.uid).get();
-  if(doc.exists){ balanceReal=doc.data().balance||0; balanceDemo=doc.data().balanceDemo||10000; }
-  else{ await db.collection('users').doc(user.uid).set({email:user.email,balance:0,balanceDemo:10000,created:Date.now()}); }
+  if(doc.exists){
+    balanceReal=doc.data().balance||0; 
+    balanceDemo=doc.data().balanceDemo ?? 10000;
+    username=doc.data().username||user.email;
+    document.getElementById('userInfo').innerText='Hi, '+username;
+  } else {
+    await db.collection('users').doc(user.uid).set({email:user.email,username:user.email.split('@')[0],balance:0,balanceDemo:10000,created:Date.now()});
+    username=user.email;
+    document.getElementById('userInfo').innerText='Hi, '+username;
+  }
   updateBal();
 });
 
-function setMode(m){mode=m; document.getElementById('demoBtn').classList.toggle('active',m=='demo'); document.getElementById('realBtn').classList.toggle('active',m=='real'); updateBal();}
-function updateBal(){ const bal=mode=='demo'?balanceDemo:balanceReal; document.getElementById('bal').innerText='KSH '+bal.toLocaleString(); const amt=parseInt(document.getElementById('amount').value||100); document.getElementById('profitPreview').innerText='+ KSH '+Math.round(amt*0.85); }
+function setMode(m){
+  mode=m; 
+  document.getElementById('demoBtn').classList.toggle('active',m=='demo'); 
+  document.getElementById('realBtn').classList.toggle('active',m=='real'); 
+  updateBal();
+  if(m=='real' && balanceReal<650){
+    openDeposit();
+    document.getElementById('depMsg').innerText='⚠️ REAL account needs minimum KSH 650 to start trading.';
+  }
+}
+function updateBal(){ 
+  const bal=mode=='demo'?balanceDemo:balanceReal; 
+  document.getElementById('bal').innerText='KSH '+bal.toLocaleString(); 
+  const amt=parseInt(document.getElementById('amount').value||100); 
+  document.getElementById('profitPreview').innerText='+ KSH '+Math.round(amt*0.85); 
+  document.getElementById('realStatus').innerText = mode=='real' ? 'REAL ACCOUNT - KSH '+balanceReal+' Real Money' : 'DEMO ACCOUNT - KSH '+balanceDemo+' Practice Money (Not Withdrawable)';
+  document.getElementById('realStatus').style.color = mode=='real' ? '#00ff88' : '#666';
+}
 document.getElementById('amount').addEventListener('input',updateBal);
 
 function openDeposit(){document.getElementById('depModal').style.display='flex'}function closeDeposit(){document.getElementById('depModal').style.display='none'}
+
 async function submitDeposit(){
-  const amt=parseInt(document.getElementById('depAmount').value); const code=document.getElementById('mpesaCode').value;
-  if(!amt||amt<100){ alert('Min 100'); return; } if(!code){ alert('Weka M-Pesa code'); return; }
-  await db.collection('deposits').add({uid:currentUser.uid,email:currentUser.email,amount:amt,code:code,status:'pending',time:Date.now()});
-  document.getElementById('depMsg').innerText='✅ Received! Admin will confirm in 2 mins. Your REAL balance will update.';
-  setTimeout(closeDeposit,2000);
+  const amt=parseInt(document.getElementById('depAmount').value); const code=document.getElementById('mpesaCode').value.trim();
+  if(!amt||amt<650){ alert('Minimum deposit is KSH 650 bro!'); return; } 
+  if(!code || code.length<6){ alert('Weka valid M-Pesa code'); return; }
+  document.getElementById('depMsg').innerText='Submitting...';
+  await db.collection('deposits').add({uid:currentUser.uid,email:currentUser.email,username:username,amount:amt,code:code,status:'pending',time:Date.now()});
+  document.getElementById('depMsg').innerText='✅ Received KSH '+amt+'! Wait for admin approval (2-5 mins). You will trade REAL after.';
+  setTimeout(closeDeposit,2500);
 }
 
 async function placeTrade(dir){
   const amt=parseInt(document.getElementById('amount').value); if(amt<50){ alert('Min 50'); return; }
-  if(mode=='demo'){ if(amt>balanceDemo){ alert('Insufficient demo'); return; } balanceDemo-=amt; await db.collection('users').doc(currentUser.uid).update({balanceDemo:balanceDemo}); }
-  else{ if(amt>balanceReal){ alert('Insufficient REAL balance. Deposit first'); openDeposit(); return; } balanceReal-=amt; await db.collection('users').doc(currentUser.uid).update({balance:balanceReal}); }
+  if(mode=='demo'){ 
+    if(amt>balanceDemo){ alert('Demo balance low! Reset?'); return; } 
+    balanceDemo-=amt; 
+    await db.collection('users').doc(currentUser.uid).update({balanceDemo:balanceDemo}); 
+  } else { 
+    if(balanceReal<650){ alert('Deposit minimum KSH 650 to trade REAL'); openDeposit(); return; }
+    if(amt>balanceReal){ alert('Insufficient REAL balance. Deposit KSH 650+'); openDeposit(); return; } 
+    balanceReal-=amt; 
+    await db.collection('users').doc(currentUser.uid).update({balance:balanceReal}); 
+  }
   updateBal();
-  const id=Date.now(); const entry=document.createElement('div'); entry.innerHTML=`<div style="display:flex;justify-content:space-between;background:#000;padding:10px;border-radius:10px;margin:5px 0;border-left:3px solid ${dir=='BUY'?'#00ff88':'#ff1a1a'}"><span>${dir} KSH ${amt}</span><span id="t${id}" style="color:#ffaa00">30s...</span></div>`; document.getElementById('tradesList').prepend(entry);
-  let sec=30; const timer=setInterval(()=>{ sec--; document.getElementById('t'+id).innerText=sec+'s...'; if(sec<=0){ clearInterval(timer); finishTrade(id,amt,dir); } },1000);
+  const id=Date.now(); const entry=document.createElement('div'); entry.innerHTML=`<div style="display:flex;justify-content:space-between;background:#000;padding:10px;border-radius:10px;margin:5px 0;border-left:3px solid ${dir=='BUY'?'#00ff88':'#ff1a1a'}"><span>${dir} KSH ${amt} (${mode})</span><span id="t${id}" style="color:#ffaa00">30s</span></div>`; document.getElementById('tradesList').prepend(entry);
+  document.getElementById('tradesList').style.textAlign='left';
+  let sec=30; const timer=setInterval(()=>{ sec--; const el=document.getElementById('t'+id); if(el) el.innerText=sec+'s'; if(sec<=0){ clearInterval(timer); finishTrade(id,amt,dir); } },1000);
 }
 
 async function finishTrade(id,amt,dir){
-  const win=Math.random()>0.45; const profit=win?Math.round(amt*1.85):0;
-  document.getElementById('t'+id).innerHTML=win?`<span class="profit">+${profit}</span>`:`<span class="loss">-${amt}</span>`;
+  const win=Math.random()>0.48; const profit=win?Math.round(amt*1.85):0;
+  const el=document.getElementById('t'+id);
+  if(el) el.innerHTML=win?`<span class="profit">WIN +${profit}</span>`:`<span class="loss">LOSS -${amt}</span>`;
   if(win){
     if(mode=='demo'){ balanceDemo+=profit; await db.collection('users').doc(currentUser.uid).update({balanceDemo:balanceDemo}); }
-    else{ balanceReal+=profit; await db.collection('users').doc(currentUser.uid).update({balance:balanceReal}); }
+    else { balanceReal+=profit; await db.collection('users').doc(currentUser.uid).update({balance:balanceReal}); }
     updateBal();
   }
-  await db.collection('trades').add({uid:currentUser.uid,amount:amt,dir:dir,win:win,mode:mode,time:Date.now()});
+  await db.collection('trades').add({uid:currentUser.uid,username:username,amount:amt,dir:dir,win:win,profit:win?profit:0,mode:mode,time:Date.now()});
 }
-function openHistory(){ window.location.href='history.html'; }
-function openReferral(){ alert('Your referral link: https://pipscheme.github.io/pipscheme.co.ke/?ref='+currentUser.uid+'\nShare and earn KSH 200 per deposit!'); }
+function logout(){ auth.signOut().then(()=>{ window.location.href='login.html'; }); }
+function openReferral(){ alert('Your Referral Link:\nhttps://pipscheme.github.io/pipscheme.co.ke/login.html?ref='+currentUser.uid+'\n\nShare & earn KSH 200 when they deposit 650+'); }
 </script>
 </body>
 </html>
