@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIPSCHEME ADMIN - pilib</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{background:#050607;color:#fff;font-family:monospace;padding:15px}
+.card{background:#13161a;border:1px solid #222;border-radius:12px;padding:15px;margin:10px 0}
+.btn{padding:10px 15px;border:none;border-radius:8px;font-weight:900;cursor:pointer;margin:3px}
+.green{background:#00ff88;color:#000}.red{background:#ff1a1a;color:#fff}.gray{background:#222;color:#888}
+.input{padding:10px;background:#000;border:1px solid #333;border-radius:8px;color:#fff;width:100%;margin:5px 0}
+h2{color:#00ff88}
+</style>
+</head>
+<body>
+<h2>PIPSCHEME ADMIN PANEL</h2>
+<p style="color:#666;font-size:12px">Logged as: <span id="adminEmail">...</span> | User: pilib</p>
+<div style="display:flex;gap:10px;margin:10px 0">
+<button class="btn gray" onclick="loadDeposits()">Pending Deposits</button>
+<button class="btn gray" onclick="loadUsers()">All Users</button>
+<button class="btn gray" onclick="loadWithdrawals()">Withdrawals</button>
+<button class="btn gray" onclick="location.href='index.html'">Go to Dashboard</button>
+</div>
+
+<div id="content">Loading...</div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme"};
+firebase.initializeApp(firebaseConfig);const auth=firebase.auth();const db=firebase.firestore();
+
+const ALLOWED_ADMIN = "kanairoliqourstore@gmail.com";
+
+auth.onAuthStateChanged(async user=>{
+  if(!user){ location.href='login.html'; return; }
+  document.getElementById('adminEmail').innerText=user.email;
+  if(user.email !== ALLOWED_ADMIN){
+    alert('Access denied! Not admin. Your email: '+user.email+' != '+ALLOWED_ADMIN);
+    location.href='index.html';
+    return;
+  }
+  loadDeposits();
+});
+
+async function loadDeposits(){
+  const snap=await db.collection('deposits').where('status','==','pending').orderBy('time','desc').limit(50).get();
+  let html=<h3>Pending Deposits (Min 650)</h3>;
+  if(snap.empty){ html+=<p style="color:#666">No pending deposits</p>; }
+  snap.forEach(doc=>{
+    const d=doc.data();
+    html+=`<div class="card">
+    <b>${d.username||''}</b> (${d.email})<br>
+    Amount: <b style="color:#00ff88">KSH ${d.amount}</b> | Code: <b>${d.code}</b><br>
+    Time: ${new Date(d.time).toLocaleString()}<br>
+    <button class="btn green" onclick="approve('${doc.id}','${d.uid}',${d.amount})">APPROVE + ADD BALANCE</button>
+    <button class="btn red" onclick="reject('${doc.id}')">REJECT</button>
+    </div>`;
+  });
+  document.getElementById('content').innerHTML=html;
+}
+
+async function approve(depId, uid, amount){
+  if(!confirm('Approve KSH '+amount+' for this user?')) return;
+  const userRef=db.collection('users').doc(uid);
+  const userDoc=await userRef.get();
+  if(!userDoc.exists){ alert('User not found'); return; }
+  const oldBal=userDoc.data().balance||0;
+  await userRef.update({balance: oldBal + amount});
+  await db.collection('deposits').doc(depId).update({status:'approved', approvedAt: Date.now(), approvedBy: ALLOWED_ADMIN});
+  
+  // Referral bonus - 200 if has refBy
+  const refBy=userDoc.data().refBy;
+  if(refBy){
+    const refUser=await db.collection('users').doc(refBy).get();
+    if(refUser.exists){
+      await db.collection('users').doc(refBy).update({balance: (refUser.data().balance||0)+200});
+    }
+  }
+  
+  alert('Approved! KSH '+amount+' added. New balance: '+(oldBal+amount));
+  loadDeposits();
+}
+
+async function reject(depId){
+  if(!confirm('Reject this deposit?')) return;
+  await db.collection('deposits').doc(depId).update({status:'rejected'});
+  loadDeposits();
+}
+
+async function loadUsers(){
+  const snap=await db.collection('users').orderBy('created','desc').limit(100).get();
+  let html=<h3>All Users (Last 100)</h3>;
+  snap.forEach(doc=>{
+    const d=doc.data();
+    html+=`<div class="card">
+    <b>${d.username}</b> - ${d.email}<br>
+    REAL: KSH ${d.balance||0} | DEMO: KSH ${d.balanceDemo||10000}<br>
+    <input id="add${doc.id}" class="input" type="number" placeholder="Add/Sub amount e.g 500 or -200">
+    <button class="btn green" onclick="addBal('${doc.id}')">Update Balance</button>
+    </div>`;
+  });
+  document.getElementById('content').innerHTML=html;
+}
+
+async function addBal(uid){
+  const val=parseInt(document.getElementById('add'+uid).value);
+  if(!val){ alert('Enter amount'); return; }
+  const ref=db.collection('users').doc(uid);
+  const doc=await ref.get();
+  await ref.update({balance: (doc.data().balance||0)+val});
+  alert('Updated!');
+  loadUsers();
+}
+
+async function loadWithdrawals(){
+  document.getElementById('content').innerHTML='<h3>Withdrawals - Coming next</h3><p style="color:#666">Tutai-add page ya withdrawal after hii.</p>';
+}
+</script>
+</body>
+</html>
