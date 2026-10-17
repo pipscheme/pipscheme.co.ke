@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIPSCHEME - Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;400&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{background:#080a0c;color:#fff;font-family:'Space Grotesk',sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:15px}
+.box{background:#13161a;border:1px solid #222;border-radius:20px;padding:25px;width:100%;max-width:390px}
+.logo{font-size:28px;font-weight:900;text-align:center;margin-bottom:5px}.logo span{color:#00ff88}
+.sub{color:#666;font-size:12px;text-align:center;margin-bottom:20px}
+.input{width:100%;padding:13px;background:#000;border:1px solid #333;border-radius:10px;color:#fff;margin:7px 0}
+.btn{width:100%;padding:14px;background:#00ff88;color:#000;border:none;border-radius:12px;font-weight:900;font-size:15px;cursor:pointer;margin-top:10px}
+.link{color:#666;font-size:13px;text-align:center;margin-top:12px;cursor:pointer}.link b{color:#00ff88}
+</style>
+</head>
+<body>
+<div class="box">
+<div class="logo">PIP<span>SCHEME</span></div>
+<p class="sub">Best Trading Platform in Kenya<br>BN-6ASRZP2L Registered</p>
+
+<div id="loginForm">
+<input id="email" class="input" type="email" placeholder="Email">
+<input id="password" class="input" type="password" placeholder="Password (min 6)">
+<button class="btn" onclick="login()">LOGIN TO DASHBOARD</button>
+<p class="link" onclick="showReg()">New user? <b>Create Account</b></p>
+</div>
+
+<div id="regForm" style="display:none">
+<input id="username" class="input" type="text" placeholder="Username e.g PipMaster">
+<input id="regEmail" class="input" type="email" placeholder="Email">
+<input id="regPass" class="input" type="password" placeholder="Create Password (min 6)">
+<button class="btn" onclick="register()">CREATE ACCOUNT & GET KSH 10,000 DEMO</button>
+<p class="link" onclick="showLogin()">Already have account? <b>Login</b></p>
+</div>
+
+<p id="msg" style="font-size:12px;text-align:center;margin-top:10px;color:#ff4444"></p>
+</div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme"};
+firebase.initializeApp(firebaseConfig);const auth=firebase.auth();const db=firebase.firestore();
+
+function showReg(){document.getElementById('loginForm').style.display='none';document.getElementById('regForm').style.display='block'}
+function showLogin(){document.getElementById('regForm').style.display='none';document.getElementById('loginForm').style.display='block'}
+
+async function register(){
+ const username=document.getElementById('username').value.trim();
+ const email=document.getElementById('regEmail').value.trim();
+ const pass=document.getElementById('regPass').value;
+ if(!username || username.length<3){ msg('Username min 3 letters'); return; }
+ if(!email || !pass || pass.length<6){ msg('Email & Password min 6'); return; }
+ try{
+  const cred=await auth.createUserWithEmailAndPassword(email,pass);
+  await db.collection('users').doc(cred.user.uid).set({
+   username:username,email:email,balance:0,balanceDemo:10000,created:Date.now(),refBy:new URLSearchParams(window.location.search).get('ref')||null
+  });
+  window.location.href='index.html';
+ }catch(e){ msg(e.message); }
+}
+
+async function login(){
+ const email=document.getElementById('email').value.trim();
+ const pass=document.getElementById('password').value;
+ if(!email||!pass){ msg('Enter email & password'); return; }
+ try{ await auth.signInWithEmailAndPassword(email,pass); window.location.href='index.html'; }
+ catch(e){ msg(e.message); }
+}
+function msg(t){document.getElementById('msg').innerText=t}
+</script>
+</body>
+</html>
