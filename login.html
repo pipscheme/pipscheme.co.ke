@@ -2,74 +2,123 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIPSCHEME - Login</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;400&display=swap" rel="stylesheet">
+<title>PIPSCHEME | Kenya's Most Trusted Trading Platform 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}body{background:#080a0c;color:#fff;font-family:'Space Grotesk',sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:15px}
-.box{background:#13161a;border:1px solid #222;border-radius:20px;padding:25px;width:100%;max-width:390px}
-.logo{font-size:28px;font-weight:900;text-align:center;margin-bottom:5px}.logo span{color:#00ff88}
-.sub{color:#666;font-size:12px;text-align:center;margin-bottom:20px}
-.input{width:100%;padding:13px;background:#000;border:1px solid #333;border-radius:10px;color:#fff;margin:7px 0}
-.btn{width:100%;padding:14px;background:#00ff88;color:#000;border:none;border-radius:12px;font-weight:900;font-size:15px;cursor:pointer;margin-top:10px}
-.link{color:#666;font-size:13px;text-align:center;margin-top:12px;cursor:pointer}.link b{color:#00ff88}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Inter',sans-serif;background:#fff;color:#111}
+.header{background:#FF2D2D;color:#fff;padding:12px 15px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:99}
+.logo{font-weight:900;font-size:22px;letter-spacing:-1px}.btn{padding:10px 18px;border-radius:30px;border:none;font-weight:800;cursor:pointer}
+.hero{padding:0 0 15px 0;background:#fff}
+.hero-top{padding:20px 15px;background:linear-gradient(180deg,#FFF5F5 0%,#fff 100%)}
+.badge{background:#111;color:#fff;padding:6px 12px;border-radius:30px;font-size:10px;display:inline-flex;gap:6px;margin-bottom:12px}
+.hero h1{font-size:32px;line-height:0.95;letter-spacing:-1.5px;font-weight:900}.hero h1 span{color:#FF2D2D}
+.sub{color:#666;font-size:13px;margin:10px 0;line-height:1.5}
+.hero-img-wrap{position:relative;margin:0 15px;border-radius:16px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.15)}
+.hero-img{width:100%;height:220px;object-fit:cover;display:block}
+.live-dot{position:absolute;top:10px;left:10px;background:#FF2D2D;color:#fff;padding:6px 12px;border-radius:20px;font-size:10px;font-weight:800;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+.chart-box{background:#fff url('chart-bg.jpg') center/cover no-repeat;border:1px solid #eee;border-radius:16px;padding:10px;margin:12px 15px;box-shadow:0 10px 30px rgba(255,45,45,0.08);position:relative;overflow:hidden;height:180px}
+.stats{display:flex;gap:8px;margin:14px 15px}.s{flex:1;background:#fff;border:1px solid #eee;border-radius:12px;padding:10px;text-align:center}.s b{color:#FF2D2D;font-size:16px;display:block}.s small{font-size:9px;color:#888}
+.login-card{background:#111;border-radius:20px;padding:18px;color:#fff;margin:15px 0}
+.input{width:100%;padding:13px;border-radius:12px;border:1px solid #333;background:#222;color:#fff;margin:6px 0}
+.red{background:#FF2D2D;color:#fff}.white{background:#fff;color:#111;border:1px solid #eee}
+.tabs{display:flex;background:#222;border-radius:30px;padding:3px;margin-bottom:12px}.tabs button{flex:1;padding:9px;border:none;border-radius:30px;background:transparent;color:#888;font-weight:700;font-size:11px}.tabs button.active{background:#fff;color:#111}
+.trust-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.t{background:#F9FAFB;border:1px solid #eee;border-radius:12px;padding:12px;text-align:center}.t b{display:block;font-size:11px;margin-top:4px}.t small{font-size:9px;color:#666}
+.testi{background:#fff;border:1px solid #eee;border-radius:12px;padding:12px;margin:8px 0;display:flex;gap:12px;align-items:center}
+.testi img{width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid #FF2D2D}
+.testi-big{background:#FFF5F5;border:1px solid #FFD6D6;border-radius:16px;padding:0;overflow:hidden;margin:12px 0}.testi-big img{width:100%;height:200px;object-fit:cover}.testi-big .txt{padding:12px}
 </style>
 </head>
 <body>
-<div class="box">
-<div class="logo">PIP<span>SCHEME</span></div>
-<p class="sub">Best Trading Platform in Kenya<br>BN-6ASRZP2L Registered</p>
 
-<div id="loginForm">
-<input id="email" class="input" type="email" placeholder="Email">
-<input id="password" class="input" type="password" placeholder="Password (min 6)">
-<button class="btn" onclick="login()">LOGIN TO DASHBOARD</button>
-<p class="link" onclick="showReg()">New user? <b>Create Account</b></p>
+<div class="header">
+<div class="logo">PIPSCHEME</div>
+<div style="font-size:10px;background:#fff;color:#FF2D2D;padding:4px 10px;border-radius:20px;font-weight:900">LIVE MARKET</div>
 </div>
 
-<div id="regForm" style="display:none">
-<input id="username" class="input" type="text" placeholder="Username e.g PipMaster">
-<input id="regEmail" class="input" type="email" placeholder="Email">
-<input id="regPass" class="input" type="password" placeholder="Create Password (min 6)">
-<button class="btn" onclick="register()">CREATE ACCOUNT & GET KSH 10,000 DEMO</button>
-<p class="link" onclick="showLogin()">Already have account? <b>Login</b></p>
+<div class="hero">
+<div class="hero-top">
+<div class="badge">✅ BN-6ASRZP2L REGISTERED • SAFARICOM M-PESA APPROVED</div>
+<h1>Kenya's <span>Trusted</span><br>Trading Platform<br>Trade EUR/USD</h1>
+<p class="sub">Join 14,732+ Kenyans. Demo account KSH 10,000 free. Learn to trade with zero risk. M-Pesa deposit & withdraw in 2 mins. Owned by pilib.</p>
 </div>
 
-<p id="msg" style="font-size:12px;text-align:center;margin-top:10px;color:#ff4444"></p>
+<!-- PICHA 1: GUY TRADING - HERO -->
+<div class="hero-img-wrap">
+<img src="guy-trade.jpg" class="hero-img" alt="Kenyan trader winning">
+<div class="live-dot">● LIVE - Kevin won +$1,210 Today</div>
+</div>
+
+<!-- PICHA 3: CHART BG + ANIMATED CHART -->
+<div class="chart-box">
+<div class="live-dot" style="position:absolute">● LIVE EUR/USD</div>
+<canvas id="animChart" style="width:100%;height:160px"></canvas>
+</div>
+
+<div class="stats">
+<div class="s"><b>14K+</b><small>TRADERS KE</small></div>
+<div class="s"><b>2 MIN</b><small>M-PESA WITHDRAW</small></div>
+<div class="s"><b>10K</b><small>FREE DEMO</small></div>
+</div>
+</div>
+
+<div style="padding:0 15px">
+<div class="login-card">
+<div class="tabs"><button id="lt" class="active" onclick="setTab('l')">OLD USER LOGIN</button><button id="st" onclick="setTab('s')">NEW USER JOIN</button></div>
+<div id="loginD"><input id="le" class="input" placeholder="Email"><input id="lp" class="input" type="password" placeholder="Password"><button class="btn red" style="width:100%;margin-top:8px" onclick="doLogin()">LOGIN TO DASHBOARD →</button></div>
+<div id="signD" style="display:none"><input id="sn" class="input" placeholder="Full Name"><input id="se" class="input" placeholder="Email"><input id="sp" class="input" type="password" placeholder="Password min 6 chars"><input id="sr" class="input" placeholder="Referral Code (optional)"><button class="btn red" style="width:100%;margin-top:8px" onclick="doSign()">CREATE ACCOUNT - GET 10K DEMO →</button></div>
+<p id="msg" style="font-size:11px;color:#FF2D2D;text-align:center;margin-top:8px"></p>
+<p style="font-size:9px;color:#666;text-align:center;margin-top:8px">Trading involves risk. Only trade what you can afford to lose. 18+ only.</p>
+</div>
+
+<h3 style="font-size:14px;margin:18px 0 8px 0">🛡️ Why PIPSCHEME is Safest in Kenya?</h3>
+<div class="trust-grid">
+<div class="t">🔒<b>BN Registered</b><small>BN-6ASRZP2L Verified</small></div>
+<div class="t">💳<b>M-Pesa Secured</b><small>Paybill 522522</small></div>
+<div class="t">⚡<b>Instant Withdraw</b><small>Under 2 Minutes</small></div>
+<div class="t">🇰🇪<b>Kenyan Owned</b><small>By pilib - Local Support</small></div>
+</div>
+
+<!-- PICHA 2: GIRL TRADING - TESTIMONIAL BIG -->
+<div class="testi-big">
+<img src="girl-trade.jpg" alt="Aisha trading">
+<div class="txt"><small>"Nimejifunza na demo 10k, sasa na trade real. Withdrawal inafika M-Pesa haraka" - <b>Aisha, Mombasa</b> ⭐⭐⭐⭐⭐</small></div>
+</div>
+
+<div class="testi">
+<img src="guy-trade.jpg" alt="Kevin">
+<div><small>"Best interface kama Deriv but made for Kenyans. Customer care wanajibu WhatsApp" - <b>Kevin, Nairobi</b> ⭐⭐⭐⭐⭐</small></div>
+</div>
+
+<div class="testi">
+<img src="girl-trade.jpg" alt="trader">
+<div><small>"Nimeanza na 100 bob tu, demo imenifundisha. Sasa naelewa forex" - <b>Brian, Kisumu</b> ⭐⭐⭐⭐⭐</small></div>
+</div>
+
+<div style="background:#111;color:#fff;border-radius:16px;padding:14px;margin:15px 0;text-align:center">
+<h4 style="color:#FF2D2D">Start Trading in 30 Seconds</h4>
+<p style="font-size:11px;color:#aaa;margin:6px 0">1. Create Account → 2. Get 10K Demo → 3. Practice → 4. Deposit 100 via M-Pesa → 5. Trade Live</p>
+<button class="btn white" style="margin-top:8px" onclick="setTab('s')">JOIN NOW FREE</button>
+</div>
+
+<p style="font-size:9px;color:#aaa;text-align:center;padding:15px">PIPSCHEME.CO.KE is an educational trading simulation platform. Risk Disclosure: Trading involves substantial risk of loss. BN-6ASRZP2L | Support: kanairoliqourstore@gmail.com | Owner: pilib | Not financial advice. 18+</p>
 </div>
 
 <script>
-const firebaseConfig={apiKey:"AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme"};
-firebase.initializeApp(firebaseConfig);const auth=firebase.auth();const db=firebase.firestore();
-
-function showReg(){document.getElementById('loginForm').style.display='none';document.getElementById('regForm').style.display='block'}
-function showLogin(){document.getElementById('regForm').style.display='none';document.getElementById('loginForm').style.display='block'}
-
-async function register(){
- const username=document.getElementById('username').value.trim();
- const email=document.getElementById('regEmail').value.trim();
- const pass=document.getElementById('regPass').value;
- if(!username || username.length<3){ msg('Username min 3 letters'); return; }
- if(!email || !pass || pass.length<6){ msg('Email & Password min 6'); return; }
- try{
-  const cred=await auth.createUserWithEmailAndPassword(email,pass);
-  await db.collection('users').doc(cred.user.uid).set({
-   username:username,email:email,balance:0,balanceDemo:10000,created:Date.now(),refBy:new URLSearchParams(window.location.search).get('ref')||null
-  });
-  window.location.href='index.html';
- }catch(e){ msg(e.message); }
-}
-
-async function login(){
- const email=document.getElementById('email').value.trim();
- const pass=document.getElementById('password').value;
- if(!email||!pass){ msg('Enter email & password'); return; }
- try{ await auth.signInWithEmailAndPassword(email,pass); window.location.href='index.html'; }
- catch(e){ msg(e.message); }
-}
-function msg(t){document.getElementById('msg').innerText=t}
+const cfg={apiKey:"AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme"};firebase.initializeApp(cfg);
+const auth=firebase.auth(),db=firebase.firestore();
+function setTab(t){lt.classList.toggle('active',t=='l');st.classList.toggle('active',t=='s');loginD.style.display=t=='l'?'block':'none';signD.style.display=t=='s'?'block':'none'}
+const r=new URLSearchParams(location.search).get('ref');if(r){sr.value=r;setTab('s')}
+async function doLogin(){try{await auth.signInWithEmailAndPassword(le.value,lp.value);location.href='index.html'}catch(e){msg.innerText=e.message}}
+async function doSign(){if(!sn.value||!se.value||!sp.value)return alert('Jaza zote');try{const c=await auth.createUserWithEmailAndPassword(se.value,sp.value);await db.collection('users').doc(c.user.uid).set({username:sn.value,email:se.value,balance:0,balanceDemo:10000,refBy:sr.value||null,created:Date.now()});await c.user.updateProfile({displayName:sn.value});location.href='index.html'}catch(e){msg.innerText=e.message}}
+const canvas=document.getElementById('animChart');const ctx=canvas.getContext('2d');function resize(){canvas.width=canvas.offsetWidth*2;canvas.height=canvas.offsetHeight*2}resize();
+let data=[];for(let i=0;i<40;i++)data.push(100+Math.sin(i*0.3)*20+Math.random()*10);
+function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='#FF2D2D';ctx.lineWidth=3;ctx.beginPath();data.forEach((v,i)=>{const x=i*(canvas.width/data.length);const y=canvas.height - (v*2);if(i==0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});ctx.stroke();
+ctx.fillStyle='#FF2D2D22';ctx.lineTo(canvas.width,canvas.height);ctx.lineTo(0,canvas.height);ctx.closePath();ctx.fill();
+data.shift();data.push(data[data.length-1]+(Math.random()-0.5)*6);requestAnimationFrame(draw)}draw();
 </script>
 </body>
 </html>
