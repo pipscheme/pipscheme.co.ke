@@ -36,7 +36,6 @@
 <span id="statusPill" class="pill orange">DEMO ACCOUNT</span>
 </div>
 
-<!-- REAL BALANCE -->
 <div class="card">
 <p style="font-size:11px;color:#888;font-weight:700">REAL BALANCE</p>
 <div class="bal-big" id="realBal">KSHS 0</div>
@@ -44,7 +43,6 @@
 <button class="btn" style="background:#00A651;color:#fff;width:100%" onclick="location.href='realmoney.html'">💰 DEPOSIT 650 KSHS - REAL MONEY</button>
 </div>
 
-<!-- DEMO BALANCE -->
 <div class="card">
 <p style="font-size:11px;color:#888;font-weight:700">DEMO BALANCE (FREE PRACTICE)</p>
 <div class="bal-demo" id="demoBal">KSHS 10,000</div>
@@ -52,7 +50,6 @@
 <button class="btn" style="background:#FF2D2D;color:#fff;width:100%" onclick="location.href='demo.html'">📈 TRADE ON DEMO FREE</button>
 </div>
 
-<!-- LIVE TRADING -->
 <div class="card">
 <h3 style="font-size:15px">🔴 Live Trading - EUR/USD</h3>
 <p style="font-size:12px;color:#666;margin:8px 0;line-height:1.6">Live inapatikana tu kama umelipa 650 KSHS na ume-verifywa. Kama bado hujalipa, utarudishwa kwa malipo.</p>
@@ -72,10 +69,15 @@
 <p style="font-size:10px;color:#999;text-align:center;padding:0 15px 20px 15px;line-height:1.6">Educational trading simulation. Trading involves risk of loss. Only trade what you can afford to lose. 18+ only.</p>
 
 <script>
-// WEKA API KEY YAKO MPYA / ILIYO-LOCK KWA DOMAIN HAPA - USITUME HAPA KWA CHAT
-const cfg={apiKey:"WEKA-API-KEY-HAPA",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme"};
-firebase.initializeApp(cfg);
+const firebaseConfig = {
+  apiKey: "AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",
+  authDomain: "pipscheme.firebaseapp.com",
+  projectId: "pipscheme"
+};
+
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(), db=firebase.firestore();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(err){ console.error("Persistence error:", err); });
 
 auth.onAuthStateChanged(async (user)=>{
   if(!user) return location.href='login.html';
