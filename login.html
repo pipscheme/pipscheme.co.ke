@@ -112,7 +112,7 @@ const cfg={apiKey:"AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",authDomain:"pipschem
 const auth=firebase.auth(),db=firebase.firestore();
 function setTab(t){lt.classList.toggle('active',t=='l');st.classList.toggle('active',t=='s');loginD.style.display=t=='l'?'block':'none';signD.style.display=t=='s'?'block':'none'}
 const r=new URLSearchParams(location.search).get('ref');if(r){sr.value=r;setTab('s')}
-async function doLogin(){try{await auth.signInWithEmailAndPassword(le.value,lp.value);location.href='index.html'}catch(e){msg.innerText=e.message}}
+async function doLogin(){try{await auth.signInWithEmailAndPassword(le.value,lp.value);location.href='dashboard.html'}catch(e){msg.innerText=e.message}}
 async function doSign(){if(!sn.value||!se.value||!sp.value)return alert('Jaza zote');try{const c=await auth.createUserWithEmailAndPassword(se.value,sp.value);await db.collection('users').doc(c.user.uid).set({username:sn.value,email:se.value,balance:0,balanceDemo:10000,refBy:sr.value||null,created:Date.now()});await c.user.updateProfile({displayName:sn.value});location.href='index.html'}catch(e){msg.innerText=e.message}}
 const canvas=document.getElementById('animChart');const ctx=canvas.getContext('2d');function resize(){canvas.width=canvas.offsetWidth*2;canvas.height=canvas.offsetHeight*2}resize();
 let data=[];for(let i=0;i<40;i++)data.push(100+Math.sin(i*0.3)*20+Math.random()*10);
