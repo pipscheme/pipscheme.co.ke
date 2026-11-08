@@ -28,7 +28,7 @@ input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #333;ba
 
 <div style="padding:14px 15px 0 15px;display:flex;justify-content:space-between;align-items:center">
 <div><p style="font-size:11px;color:#999">BALANCE</p><b id="bal" style="font-size:20px">KSHS 0</b></div>
-<div style="text-align:right"><span id="modePill" style="background:#FF2D2D;padding:6px 10px;border-radius:20px;font-size:10px;font-weight:800">DEMO MODE</span><p id="userEmail" style="font-size:10px;color:#888;margin-top:4px"></p></div>
+<div style="text-align:right"><span id="modePill" style="background:#FF2D2D;padding:6px 10px;border-radius:20px;font-size:10px;font-weight:800">DEMO MODE</span><p id="userEmail" style="font-size:12px;color:#bbb"></p></div>
 </div>
 
 <div class="card">
@@ -58,13 +58,18 @@ input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #333;ba
 </div>
 
 <script>
-const cfg={apiKey:"WEKA-API-KEY-HAPA",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme"};
-firebase.initializeApp(cfg);
+const firebaseConfig = {
+  apiKey: "AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",
+  authDomain: "pipscheme.firebaseapp.com",
+  projectId: "pipscheme"
+};
+
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(), db=firebase.firestore();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(err){ console.error("Persistence error:", err); });
 let curUser=null, userData=null, isReal=false, curPrice=1.0850, openPrice=1.0850;
 let historyArr=[], prices=[1.0850];
 
-// --- CHART ---
 const cv=document.getElementById('chart'), ctx=cv.getContext('2d');
 function drawChart(){
   cv.width=cv.offsetWidth; cv.height=180;
@@ -87,7 +92,6 @@ setInterval(()=>{
   drawChart();
 },1000);
 
-// --- AUTH + BALANCE ---
 auth.onAuthStateChanged(async (user)=>{
   if(!user) return location.href='login.html';
   curUser=user; document.getElementById('userEmail').innerText=user.email;
@@ -114,7 +118,6 @@ async function placeTrade(dir){
   if(amt > bal){ document.getElementById('tradeMsg').innerText='Balance haitoshi'; return; }
   let entry=curPrice;
   document.getElementById('tradeMsg').innerText='⏳ Trade imefunguliwa '+dir+' @ '+entry.toFixed(4)+' - Subiri '+dur+'s...';
-  // Deduct
   let newBal=bal-amt;
   await db.collection('users').doc(curUser.uid).update({[balField]:newBal});
   userData[balField]=newBal; updateBal();
