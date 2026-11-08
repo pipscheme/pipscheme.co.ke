@@ -68,11 +68,16 @@ label{font-size:12px;font-weight:700;color:#555}
 </div>
 
 <script>
-// WEKA API KEY YAKO HAPA - ILIYO-LOCK KWA DOMAIN
-const cfg={apiKey:"WEKA-API-KEY-HAPA",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme"};
-firebase.initializeApp(cfg);
+const firebaseConfig = {
+  apiKey: "AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",
+  authDomain: "pipscheme.firebaseapp.com",
+  projectId: "pipscheme"
+};
+
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(), db=firebase.firestore();
 let curUser=null;
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(err){ console.error("Persistence error:", err); });
 
 auth.onAuthStateChanged(async (user)=>{
   if(!user) return location.href='login.html';
