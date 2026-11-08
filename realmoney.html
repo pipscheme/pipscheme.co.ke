@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deposit - PIPSCHEME</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Inter',sans-serif;background:#F6F7F9;color:#111}
+.header{background:#FF2D2D;color:#fff;padding:12px 15px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:900;font-size:20px}
+.btn{padding:14px 16px;border-radius:30px;border:none;font-weight:800;cursor:pointer;font-size:13px;width:100%}
+.card{background:#fff;border:1px solid #eee;border-radius:18px;padding:16px;margin:14px 15px}
+.till{background:#111;color:#fff;border-radius:14px;padding:16px;text-align:center;margin:12px 0}
+.till b{font-size:28px;letter-spacing:2px;display:block}
+.till small{color:#aaa}
+.step{display:flex;gap:10px;margin:10px 0;align-items:flex-start}
+.num{background:#FF2D2D;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0}
+.step p{font-size:13px;line-height:1.5;color:#444}
+input{width:100%;padding:13px;border:1px solid #ddd;border-radius:12px;margin:8px 0;font-size:15px}
+label{font-size:12px;font-weight:700;color:#555}
+</style>
+</head>
+<body>
+
+<div class="header">
+<div class="logo">PIPSCHEME</div>
+<button onclick="location.href='dashboard.html'" style="background:#fff;color:#FF2D2D;border:none;padding:8px 14px;border-radius:20px;font-weight:800">← BACK</button>
+</div>
+
+<div style="padding:16px 15px 0 15px">
+<h2 style="font-size:22px">Deposit Real Money</h2>
+<p style="font-size:13px;color:#666;margin-top:4px">Minimum <b>650 KSHS</b> to unlock Live Trading. Deposit ni manual via M-PESA Till.</p>
+</div>
+
+<div class="card">
+<h3 style="font-size:14px">How to Pay - M-PESA</h3>
+<div class="till">
+<small>BUY GOODS TILL NUMBER</small>
+<b>1875493</b>
+<small>Till Name: PIPSCHEME</small>
+</div>
+<div class="step"><div class="num">1</div><p>Go to <b>M-PESA > Lipa na M-PESA > Buy Goods & Services</b></p></div>
+<div class="step"><div class="num">2</div><p>Enter Till <b>1875493</b> na Amount <b>650</b> (au zaidi)</p></div>
+<div class="step"><div class="num">3</div><p>Ingiza PIN, utapata SMS na <b>Code kama QK...</b></p></div>
+<div class="step"><div class="num">4</div><p>Weka hio Code hapa chini, tuta-verify ndani ya dakika chache.</p></div>
+</div>
+
+<div class="card">
+<h3 style="font-size:14px">Confirm Your Payment</h3>
+<label>AMOUNT (KSHS)</label>
+<input id="amount" type="number" value="650" min="650" placeholder="650">
+<label>M-PESA CODE (kutoka SMS)</label>
+<input id="mpesaCode" type="text" placeholder="e.g. QK7X..." style="text-transform:uppercase">
+<label>PHONE ILIYOLIPA</label>
+<input id="phone" type="tel" placeholder="07XX XXX XXX">
+<p id="msg" style="font-size:12px;color:#c00;margin:6px 0;min-height:16px"></p>
+<button class="btn" style="background:#00A651;color:#fff" onclick="submitDeposit()">I HAVE PAID - VERIFY →</button>
+<p style="font-size:11px;color:#999;text-align:center;margin-top:10px;line-height:1.6">Usitume pesa kwa namba ya mtu. Tumia Till 1875493 tu. Kama umetuma kwa bahati mbaya, wasiliana na support kabla ya ku-submit.</p>
+</div>
+
+<div class="card">
+<h3 style="font-size:14px">Status ya Deposit yako</h3>
+<p id="depStatus" style="font-size:13px;color:#666;margin-top:6px">Hakuna deposit bado.</p>
+<button class="btn" style="background:#111;color:#fff;margin-top:10px" onclick="location.href='dashboard.html'">GO TO DASHBOARD</button>
+</div>
+
+<script>
+// WEKA API KEY YAKO HAPA - ILIYO-LOCK KWA DOMAIN
+const cfg={apiKey:"WEKA-API-KEY-HAPA",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme"};
+firebase.initializeApp(cfg);
+const auth=firebase.auth(), db=firebase.firestore();
+let curUser=null;
+
+auth.onAuthStateChanged(async (user)=>{
+  if(!user) return location.href='login.html';
+  curUser=user;
+  const doc = await db.collection('users').doc(user.uid).get();
+  if(doc.exists && doc.data().paid === true){
+    document.getElementById('depStatus').innerText = '✅ Deposit yako imeshathibitishwa. Unaweza kuingia Live Trading.';
+  }
+});
+
+async function submitDeposit(){
+  const amt = document.getElementById('amount').value;
+  const code = document.getElementById('mpesaCode').value.trim().toUpperCase();
+  const phone = document.getElementById('phone').value.trim();
+  const msg = document.getElementById('msg');
+  if(!amt || amt < 650){ msg.innerText='Minimum ni 650 KSHS'; return; }
+  if(!code || code.length < 6){ msg.innerText='Weka M-PESA Code sahihi kutoka SMS'; return; }
+  if(!phone || phone.length < 10){ msg.innerText='Weka namba ya simu iliyolipa'; return; }
+  if(!curUser){ msg.innerText='Tafadhali login tena'; return; }
+  msg.style.color='#00A651'; msg.innerText='Inatuma...';
+  try{
+    await db.collection('deposits').add({
+      uid: curUser.uid,
+      email: curUser.email,
+      amount: Number(amt),
+      mpesaCode: code,
+      phone: phone,
+      status: 'pending',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    msg.innerText='✅ Imetumwa! Tutasoma code na kuku-activate. Check dashboard baada ya dakika chache.';
+    document.getElementById('depStatus').innerText = '⏳ Deposit ya KSHS '+amt+' Code '+code+' - INASUBIRI KUTHIBITISHWA';
+  }catch(e){ msg.style.color='#c00'; msg.innerText=e.message; }
+}
+</script>
+</body>
+</html>
