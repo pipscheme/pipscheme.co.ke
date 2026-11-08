@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Trading - PIPSCHEME</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Inter',sans-serif;background:#0F1115;color:#fff}
+.header{background:#FF2D2D;padding:12px 15px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:900;font-size:19px}
+.btn{padding:13px;border:none;border-radius:12px;font-weight:800;cursor:pointer;font-size:14px}
+.card{background:#1A1E26;border:1px solid #2A2F3A;border-radius:16px;padding:14px;margin:12px 15px}
+#price{font-size:32px;font-weight:900}
+.up{color:#00C853}.down{color:#FF2D2D}
+#chart{width:100%;height:180px;background:#11141A;border-radius:12px}
+input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #333;background:#111;color:#fff;margin:6px 0}
+</style>
+</head>
+<body>
+
+<div class="header">
+<div class="logo">PIPSCHEME LIVE</div>
+<button onclick="location.href='dashboard.html'" style="background:#fff;color:#FF2D2D;border:none;padding:7px 13px;border-radius:20px;font-weight:800">← DASHBOARD</button>
+</div>
+
+<div style="padding:14px 15px 0 15px;display:flex;justify-content:space-between;align-items:center">
+<div><p style="font-size:11px;color:#999">BALANCE</p><b id="bal" style="font-size:20px">KSHS 0</b></div>
+<div style="text-align:right"><span id="modePill" style="background:#FF2D2D;padding:6px 10px;border-radius:20px;font-size:10px;font-weight:800">DEMO MODE</span><p id="userEmail" style="font-size:10px;color:#888;margin-top:4px"></p></div>
+</div>
+
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div><b>EUR / USD</b><p style="font-size:11px;color:#888">1 Minute Chart - Simulation</p></div>
+<div style="text-align:right"><div id="price">1.0850</div><div id="change" class="up">+0.00%</div></div>
+</div>
+<canvas id="chart"></canvas>
+<p style="font-size:10px;color:#888;margin-top:6px;text-align:center">This is an educational simulation. Price is simulated for learning, not a real market feed.</p>
+</div>
+
+<div class="card">
+<label style="font-size:12px">AMOUNT (KSHS)</label>
+<input id="amount" type="number" value="100" min="10">
+<label style="font-size:12px">DURATION</label>
+<select id="duration"><option value="30">30 Seconds</option><option value="60" selected>1 Minute</option><option value="120">2 Minutes</option></select>
+<div style="display:flex;gap:10px;margin-top:10px">
+<button class="btn" style="background:#00C853;color:#fff;flex:1" onclick="placeTrade('UP')">▲ UP - CALL</button>
+<button class="btn" style="background:#FF2D2D;color:#fff;flex:1" onclick="placeTrade('DOWN')">▼ DOWN - PUT</button>
+</div>
+<p id="tradeMsg" style="font-size:12px;margin-top:10px;min-height:18px;color:#FFD600"></p>
+</div>
+
+<div class="card">
+<h3 style="font-size:14px">My Trades</h3>
+<div id="history" style="font-size:12px;color:#aaa;margin-top:8px">Hakuna trade bado.</div>
+</div>
+
+<script>
+const cfg={apiKey:"WEKA-API-KEY-HAPA",authDomain:"pipscheme.firebaseapp.com",projectId:"pipscheme"};
+firebase.initializeApp(cfg);
+const auth=firebase.auth(), db=firebase.firestore();
+let curUser=null, userData=null, isReal=false, curPrice=1.0850, openPrice=1.0850;
+let historyArr=[], prices=[1.0850];
+
+// --- CHART ---
+const cv=document.getElementById('chart'), ctx=cv.getContext('2d');
+function drawChart(){
+  cv.width=cv.offsetWidth; cv.height=180;
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.beginPath(); ctx.strokeStyle='#FF2D2D'; ctx.lineWidth=2;
+  let min=Math.min(...prices), max=Math.max(...prices), range=(max-min)||0.0001;
+  prices.forEach((p,i)=>{
+    let x=i/(prices.length-1||1)*cv.width;
+    let y=170-((p-min)/range)*150;
+    i==0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+}
+setInterval(()=>{
+  let change=(Math.random()-0.5)*0.0008;
+  curPrice+=change; prices.push(curPrice); if(prices.length>50) prices.shift();
+  document.getElementById('price').innerText=curPrice.toFixed(4);
+  let pct=((curPrice-openPrice)/openPrice*100).toFixed(2);
+  let el=document.getElementById('change'); el.innerText=(pct>=0?'+':'')+pct+'%'; el.className=pct>=0?'up':'down';
+  drawChart();
+},1000);
+
+// --- AUTH + BALANCE ---
+auth.onAuthStateChanged(async (user)=>{
+  if(!user) return location.href='login.html';
+  curUser=user; document.getElementById('userEmail').innerText=user.email;
+  const doc=await db.collection('users').doc(user.uid).get();
+  if(!doc.exists) return;
+  userData=doc.data();
+  isReal = userData.paid===true;
+  if(isReal){
+    document.getElementById('modePill').innerText='✅ REAL MONEY';
+    document.getElementById('modePill').style.background='#00A651';
+    document.getElementById('bal').innerText='KSHS '+(userData.balance||0);
+  } else {
+    document.getElementById('bal').innerText='KSHS '+(userData.balanceDemo ?? 10000)+' (DEMO)';
+  }
+});
+
+async function placeTrade(dir){
+  if(!curUser) return;
+  let amt=Number(document.getElementById('amount').value);
+  let dur=Number(document.getElementById('duration').value);
+  let balField = isReal ? 'balance' : 'balanceDemo';
+  let bal = isReal ? (userData.balance||0) : (userData.balanceDemo ?? 10000);
+  if(!amt || amt < 10){ document.getElementById('tradeMsg').innerText='Minimum ni 10 KSHS'; return; }
+  if(amt > bal){ document.getElementById('tradeMsg').innerText='Balance haitoshi'; return; }
+  let entry=curPrice;
+  document.getElementById('tradeMsg').innerText='⏳ Trade imefunguliwa '+dir+' @ '+entry.toFixed(4)+' - Subiri '+dur+'s...';
+  // Deduct
+  let newBal=bal-amt;
+  await db.collection('users').doc(curUser.uid).update({[balField]:newBal});
+  userData[balField]=newBal; updateBal();
+  setTimeout(async ()=>{
+    let exit=curPrice;
+    let win = (dir==='UP' && exit>entry) || (dir==='DOWN' && exit<entry);
+    let payout = win ? Math.round(amt*1.80) : 0;
+    if(win){
+      let finalBal=newBal+payout;
+      await db.collection('users').doc(curUser.uid).update({[balField]:finalBal});
+      userData[balField]=finalBal;
+    }
+    updateBal();
+    document.getElementById('tradeMsg').innerText = win ? '✅ WON! +'+payout+' KSHS (Exit '+exit.toFixed(4)+')' : '❌ LOST -'+amt+' KSHS (Exit '+exit.toFixed(4)+')';
+    historyArr.unshift({dir, amt, entry:entry.toFixed(4), exit:exit.toFixed(4), res: win?'WON +'+payout:'LOST -'+amt});
+    document.getElementById('history').innerHTML = historyArr.map(h=>'<div style="padding:8px 0;border-bottom:1px solid #2A2F3A">'+h.dir+' '+h.amt+' KSHS - '+h.entry+' → '+h.exit+' - <b>'+h.res+'</b></div>').join('');
+  }, dur*1000);
+}
+function updateBal(){
+  document.getElementById('bal').innerText = isReal ? 'KSHS '+(userData.balance||0) : 'KSHS '+(userData.balanceDemo ?? 10000)+' (DEMO)';
+}
+</script>
+</body>
+</html>
