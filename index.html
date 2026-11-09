@@ -1,28 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIPSCHEME | Learn & Trade</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIPSCHEME | Learn &amp; Trade</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Inter',sans-serif;background:#fff;color:#111}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fff;color:#111}
 .header{background:#FF2D2D;color:#fff;padding:12px 15px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:99}
-.logo{font-weight:900;font-size:22px}
+.logo{font-weight:900;font-size:22px;letter-spacing:-.5px}
 .btn{padding:12px 18px;border-radius:30px;border:none;font-weight:800;cursor:pointer}
-.hero-top{padding:22px 15px;background:linear-gradient(180deg,#FFF5F5 0%,#fff 100%)}
-.hero h1{font-size:34px;line-height:0.95;font-weight:900}.hero h1 span{color:#FF2D2D}
+.hero-top{padding:26px 15px 20px;background:linear-gradient(180deg,#FFF5F5 0%,#fff 100%)}
+.hero-top h1{font-size:34px;line-height:1;font-weight:900;letter-spacing:-1.5px}
+.hero-top h1 span{color:#FF2D2D}
+.promo-card{position:relative;margin-top:20px;padding:18px 20px 19px;background:linear-gradient(135deg,#fff 0%,#fff8f4 100%);border:1px solid #f3dfd7;border-radius:18px;box-shadow:0 10px 28px rgba(104,42,24,.08);overflow:hidden}
+.promo-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#FF2D2D,#ff8159)}
+.promo-label{display:inline-flex;align-items:center;gap:7px;margin-bottom:8px;color:#a6422e;font-size:10px;font-weight:800;letter-spacing:1.15px;text-transform:uppercase}
+.promo-label:before{content:"";width:6px;height:6px;border-radius:50%;background:#FF2D2D}
+.promo-amount{color:#171717;font-size:clamp(35px,10vw,46px);font-weight:900;line-height:1;letter-spacing:-2px}
+.promo-description{margin-top:7px;color:#625b58;font-size:14px;font-weight:600;line-height:1.45}
+.promo-description strong{color:#FF2D2D;font-weight:800}
 .sub{color:#666;font-size:13.5px;margin:10px 0;line-height:1.5}
 /* PICHA FULL - HAIKATWI */
 .hero-img-wrap{margin:12px 15px;border-radius:18px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.14)}
 .hero-img{width:100%;height:auto;display:block}
-.stats{display:flex;gap:8px;margin:14px 15px}.s{flex:1;background:#fff;border:1px solid #eee;border-radius:12px;padding:12px;text-align:center}.s b{color:#FF2D2D;font-size:17px;display:block}.s small{font-size:9px;color:#888}
+.stats{display:flex;gap:8px;margin:14px 15px}
+.s{flex:1;background:#fff;border:1px solid #eee;border-radius:12px;padding:12px;text-align:center}
+.s b{color:#FF2D2D;font-size:17px;display:block}
+.s small{color:#777;font-size:9px;font-weight:700;letter-spacing:.3px}
+@media (min-width:600px){.hero-top{padding:34px 24px 24px}.hero-top h1{font-size:44px}.promo-card{max-width:520px;padding:22px 24px}.hero-img-wrap,.stats{margin-left:24px;margin-right:24px}}
 </style>
 </head>
 <body>
 <div class="header"><div class="logo">PIPSCHEME</div><button class="btn" style="background:#fff;color:#FF2D2D" onclick="location.href='login.html'">LOGIN</button></div>
 
 <div class="hero-top">
-<h1>LEARN TO <span>TRADE</span><br>Deposit And get <br> KSHS 1000 CASHBACK REAL MONEY </h1>
+<h1>LEARN TO <span>TRADE</span></h1>
+<div class="promo-card" aria-label="Cashback promotion: deposit and get KSh 1,000 cashback in real money">
+<div class="promo-label">Cashback offer</div>
+<div class="promo-amount">KSh 1,000</div>
+<p class="promo-description">Deposit and get <strong>cashback in real money.</strong></p>
+</div>
 <p class="sub"></p>
 <button class="btn" style="background:#FF2D2D;color:#fff;width:100%;margin-top:10px" onclick="location.href='login.html'">START TRADING FREE →</button>
 </div>
