@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STK Push Deposit - PIPSCHEME</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Inter',sans-serif;background:#F6F7F9;color:#111}.header{background:#FF2D2D;color:#fff;padding:12px 15px;display:flex;justify-content:space-between;align-items:center}.logo{font-weight:900;font-size:20px}.btn{display:block;width:100%;padding:14px 16px;border-radius:30px;border:none;font-weight:800;cursor:pointer;font-size:13px;text-align:center;text-decoration:none}.card{background:#fff;border:1px solid #eee;border-radius:18px;padding:16px;margin:14px 15px}.input{width:100%;padding:13px;border:1px solid #ddd;border-radius:12px;margin:8px 0 14px;font-size:15px}.label{font-size:12px;font-weight:700;color:#555}.notice{font-size:13px;line-height:1.55;color:#555}.status{font-size:13px;line-height:1.5;margin:10px 0;min-height:20px}.muted{font-size:11px;color:#777;line-height:1.5;margin-top:12px}.secondary{background:#111;color:#fff}.danger{background:#FF2D2D;color:#fff}.success{background:#00A651;color:#fff}.button-disabled{opacity:.7;cursor:not-allowed}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo">PIPSCHEME</div>
+  <button onclick="location.href='dashboard.html'" style="background:#fff;color:#FF2D2D;border:none;padding:8px 14px;border-radius:20px;font-weight:800;cursor:pointer">← BACK</button>
+</div>
+
+<div style="padding:16px 15px 0">
+  <h2 style="font-size:22px">Deposit with M-PESA</h2>
+  <p class="notice" style="margin-top:5px">Use the secure STK push flow below. Minimum deposit: <b>KSh 650</b>. If STK is unavailable, you can still use the original manual payment page.</p>
+</div>
+
+<div class="card">
+  <label class="label" for="amount">AMOUNT (KSH)</label>
+  <input class="input" id="amount" type="number" value="650" min="650" step="1" inputmode="numeric">
+
+  <label class="label" for="phone">M-PESA PHONE NUMBER</label>
+  <input class="input" id="phone" type="tel" autocomplete="tel" placeholder="07XXXXXXXX or 2547XXXXXXXX">
+
+  <p id="msg" class="status" role="status" aria-live="polite"></p>
+
+  <button id="stkButton" class="btn success" onclick="startStkPush()">SEND STK PUSH</button>
+  <p class="muted">A STK prompt is not proof of payment. Funds are only credited after Safaricom callback validation on the backend.</p>
+</div>
+
+<div class="card">
+  <h3 style="font-size:15px;margin-bottom:8px">Manual fallback</h3>
+  <p class="notice">The old manual payment page remains available if you want to keep the current flow active while STK Push is being tested.</p>
+  <a class="btn secondary" style="margin-top:12px" href="realmoney.html">USE MANUAL PAYMENT</a>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBNUbfl8OCGDsZx2aYguwn4gcmCiIjYoKQ",
+  authDomain: "pipscheme.firebaseapp.com",
+  projectId: "pipscheme"
+};
+
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const functions = firebase.app().functions();
+let curUser = null;
+let authReady = false;
+
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(err){ console.error('Persistence error:', err); });
+auth.onAuthStateChanged(function(user){
+  authReady = true;
+  if (!user) {
+    location.href = 'login.html';
+    return;
+  }
+  curUser = user;
+});
+
+function normalizeKenyanPhone(value) {
+  let digits = String(value || '').replace(/\D/g, '');
+  if (digits.startsWith('0')) digits = '254' + digits.slice(1);
+  if (digits.startsWith('7') || digits.startsWith('1')) digits = '254' + digits;
+  return /^254[17]\d{8}$/.test(digits) ? digits : null;
+}
+
+async function startStkPush() {
+  const msg = document.getElementById('msg');
+  const button = document.getElementById('stkButton');
+  const amount = Number(document.getElementById('amount').value);
+  const phone = normalizeKenyanPhone(document.getElementById('phone').value);
+
+  if (!authReady || !curUser) {
+    msg.style.color = '#c00';
+    msg.textContent = 'Please sign in again, then retry.';
+    return;
+  }
+
+  if (!Number.isSafeInteger(amount) || amount < 650) {
+    msg.style.color = '#c00';
+    msg.textContent = 'Minimum deposit is KSh 650.';
+    return;
+  }
+
+  if (!phone) {
+    msg.style.color = '#c00';
+    msg.textContent = 'Enter a valid Kenyan mobile number, e.g. 07XXXXXXXX.';
+    return;
+  }
+
+  button.disabled = true;
+  button.classList.add('button-disabled');
+  button.textContent = 'SENDING REQUEST…';
+  msg.style.color = '#555';
+  msg.textContent = 'Contacting the payment service…';
+
+  try {
+    // IMPORTANT: this callable function must be deployed separately.
+    // It should authenticate the user, validate inputs, call Safaricom Daraja STK Push,
+    // save a pending deposit in Firestore, and update status only when the callback confirms success.
+    const createStkPush = functions.httpsCallable('createStkPush');
+    const result = await createStkPush({ amount, phoneNumber: phone });
+
+    if (result && result.data && result.data.success === false) {
+      throw new Error(result.data.message || 'STK Push failed');
+    }
+
+    msg.style.color = '#087a3b';
+    msg.textContent = 'STK request sent. Please complete the prompt on your phone. The deposit will be confirmed by the secured callback.';
+  } catch (error) {
+    console.error('STK Push request failed:', error);
+    msg.style.color = '#c00';
+    msg.textContent = 'STK Push is unavailable right now. Please use the manual payment option below.';
+  } finally {
+    button.disabled = false;
+    button.classList.remove('button-disabled');
+    button.textContent = 'SEND STK PUSH';
+  }
+}
+</script>
+</body>
+</html>
